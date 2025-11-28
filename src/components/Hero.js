@@ -28,10 +28,13 @@ function Hero() {
             </div>
           </div>
         </div>
-        <div 
-          className="et_pb_column hero-column-portrait"
-          style={{ backgroundImage: `url(${portraitImage})` }}
-        ></div>
+        <div className="et_pb_column hero-column-portrait">
+          <div className="et_pb_image hero-portrait-image">
+            <span className="et_pb_image_wrap">
+              <img src={portraitImage} alt="Wilma Henderikse" />
+            </span>
+          </div>
+        </div>
       </div>
     </section>
   );

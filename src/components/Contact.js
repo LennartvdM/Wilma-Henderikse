@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useScrollAnimation } from '../utils/animations';
 import './Contact.css';
 
 function Contact() {
@@ -46,11 +47,17 @@ function Contact() {
     });
   };
 
+  const sectionRef = useScrollAnimation('zoom', 'bottom', 0, '10%');
+  const titleRowRef = useScrollAnimation('fade', 'top', 0, '0');
+  const titleRef = useScrollAnimation('slide', 'bottom', 0, '4%');
+  const emailRef = useScrollAnimation('slide', 'bottom', 100, '4%');
+  const formRef = useScrollAnimation('fade', 'top', 0, '0');
+
   return (
-    <section className="et_pb_section contact-section">
-      <div className="et_pb_row contact-title-row">
+    <section ref={sectionRef} className="et_pb_section contact-section">
+      <div ref={titleRowRef} className="et_pb_row contact-title-row">
         <div className="et_pb_column contact-column">
-          <div className="et_pb_text contact-title">
+          <div ref={titleRef} className="et_pb_text contact-title">
             <div className="et_pb_text_inner">
               <h2>
                 Vragen?<br />
@@ -58,7 +65,7 @@ function Contact() {
               </h2>
             </div>
           </div>
-          <div className="et_pb_text contact-email">
+          <div ref={emailRef} className="et_pb_text contact-email">
             <div className="et_pb_text_inner">
               <h1>
                 <a href="mailto:info@wilmahenderikse.nl">
@@ -71,7 +78,7 @@ function Contact() {
       </div>
       <div className="et_pb_row contact-form-row">
         <div className="et_pb_column contact-form-column">
-          <div className="et_pb_contact_form_container">
+          <div ref={formRef} className="et_pb_contact_form_container">
             <div className="et-pb-contact-message"></div>
             <div className="et_pb_contact">
               <form className="et_pb_contact_form" onSubmit={handleSubmit}>
@@ -152,4 +159,5 @@ function Contact() {
 }
 
 export default Contact;
+
 

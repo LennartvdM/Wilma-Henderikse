@@ -1,12 +1,16 @@
 import React from 'react';
+import { useScrollAnimation } from '../utils/animations';
 import './Quote.css';
 
 function Quote() {
+  const rowRef = useScrollAnimation('fade', 'top', 0, '0');
+  const textRef = useScrollAnimation('slide', 'bottom', 0, '4%');
+
   return (
     <section className="et_pb_section quote-section">
-      <div className="et_pb_row quote-row">
+      <div ref={rowRef} className="et_pb_row quote-row">
         <div className="et_pb_column quote-column">
-          <div className="et_pb_text quote-text">
+          <div ref={textRef} className="et_pb_text quote-text">
             <div className="et_pb_text_inner">
               <h2>
                 <em>"It's the job that's never started as takes longest to finish."</em>
@@ -27,4 +31,5 @@ function Quote() {
 }
 
 export default Quote;
+
 

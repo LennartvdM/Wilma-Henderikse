@@ -1,0 +1,148 @@
+/* Divi-style scroll animations */
+
+/* Base animation styles */
+[data-animation] {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-animation].et-animated {
+  opacity: 1;
+}
+
+/* Fade animations */
+.et-animation-fade {
+  opacity: 0;
+}
+
+.et-animation-fade.et-animated {
+  opacity: 1;
+  animation: etFadeIn 0.6s ease forwards;
+}
+
+@keyframes etFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide animations */
+.et-animation-slide {
+  opacity: 0;
+}
+
+.et-animation-slide[data-animation-direction="top"].et-animated {
+  animation: etSlideFromTop 0.8s ease forwards;
+}
+
+.et-animation-slide[data-animation-direction="bottom"].et-animated {
+  animation: etSlideFromBottom 0.8s ease forwards;
+}
+
+.et-animation-slide[data-animation-direction="left"].et-animated {
+  animation: etSlideFromLeft 0.8s ease forwards;
+}
+
+.et-animation-slide[data-animation-direction="right"].et-animated {
+  animation: etSlideFromRight 0.8s ease forwards;
+}
+
+@keyframes etSlideFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes etSlideFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes etSlideFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes etSlideFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Zoom animations */
+.et-animation-zoom {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.et-animation-zoom.et-animated {
+  animation: etZoomIn 0.8s ease forwards;
+}
+
+@keyframes etZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Intensity variations for zoom */
+.et-animation-zoom[data-animation-intensity="4%"].et-animated {
+  animation: etZoomIn4 0.8s ease forwards;
+}
+
+@keyframes etZoomIn4 {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.et-animation-zoom[data-animation-intensity="10%"].et-animated {
+  animation: etZoomIn10 0.8s ease forwards;
+}
+
+@keyframes etZoomIn10 {
+  from {
+    opacity: 0;
+    transform: scale(0.90);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+

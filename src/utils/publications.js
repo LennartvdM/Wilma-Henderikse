@@ -29,3 +29,4 @@ export function getFilenameFromPath(path) {
 // Base path for publications
 export const PUBLICATIONS_PATH = '/wp-content/uploads/publications/';
 
+

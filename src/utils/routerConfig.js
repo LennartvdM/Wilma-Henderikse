@@ -12,3 +12,4 @@ export const getRouterType = () => {
   return shouldUseHashRouter() ? 'HashRouter' : 'BrowserRouter';
 };
 
+

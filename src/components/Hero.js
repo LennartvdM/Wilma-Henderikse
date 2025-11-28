@@ -39,7 +39,9 @@ function Hero() {
           className="et_pb_column hero-column-portrait"
           style={{ 
             backgroundImage: `url(${portraitImage})`,
-            minHeight: '100vh'
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
           }}
         ></div>
       </div>

@@ -90,7 +90,7 @@
   margin-top: 0;
   margin-bottom: -1px;
   box-shadow: inset 0px 100px 0px 0px #ffffff;
-  background-image: url('/wp-content/uploads/2018/10/Lepelaar-11.png');
+  background-image: var(--about-bg, none);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -103,7 +103,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/wp-content/uploads/2018/10/Lepelaar-11.png');
+  background-image: var(--about-bg, none);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

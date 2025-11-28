@@ -2,8 +2,13 @@ import React from 'react';
 import './Hero.css';
 
 function Hero() {
+  const heroBackground = `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/background-texture.jpg`;
+
   return (
-    <section className="et_pb_section hero-section">
+    <section
+      className="et_pb_section hero-section"
+      style={{ '--hero-bg': `url(${heroBackground})` }}
+    >
       <div className="et_pb_row hero-row">
         <div className="et_pb_column hero-column">
           <div className="et_pb_text hero-text">

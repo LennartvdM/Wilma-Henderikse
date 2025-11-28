@@ -117,23 +117,23 @@
   z-index: 1;
 }
 
-.publication-image:hover {
-  transform: translateY(-8px) scale(1.02);
+.publication-image.is-hovered {
+  transform: translateY(-4px) scale(1.03) !important;
   box-shadow: var(--shadow-lg);
   z-index: 10;
 }
 
-.publication-image:hover::before {
-  opacity: 0.15;
+.publication-image.is-hovered::before {
+  opacity: 0.1;
 }
 
-.publication-image:hover::after {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
+.publication-image.is-hovered::after {
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0.6;
 }
 
-.publication-image:hover img {
-  transform: scale(1.08);
+.publication-image.is-hovered img {
+  transform: scale(1.02);
 }
 
 /* Bento-style layout with dramatic scale differences - cards fit together seamlessly */

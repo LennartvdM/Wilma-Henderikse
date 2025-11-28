@@ -79,106 +79,15 @@ function PublicationsGallery() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Recalculate positions when a card is hovered
+  // Initialize positions - no need to recalculate on hover anymore
   useEffect(() => {
-    if (hoveredIndex === null) {
-      // Reset to base positions
-      const basePositions = publications.map((pub) => ({
-        size: { ...pub.baseSize },
-        position: { ...pub.basePosition }
-      }));
-      setCardPositions(basePositions);
-      return;
-    }
-
-    setCardPositions((prevPositions) => {
-      // Get current positions or initialize from base
-      const currentPositions = prevPositions.length > 0 
-        ? prevPositions.map(pos => ({ ...pos, size: { ...pos.size }, position: { ...pos.position } }))
-        : publications.map((pub) => ({
-            size: { ...pub.baseSize },
-            position: { ...pub.basePosition }
-          }));
-      
-      const newPositions = currentPositions.map(pos => ({
-        size: { ...pos.size },
-        position: { ...pos.position }
-      }));
-      
-      if (newPositions.length === 0) return prevPositions;
-      
-      const hoveredCard = newPositions[hoveredIndex];
-      const basePub = publications[hoveredIndex];
-      
-      // Grow the hovered card
-      hoveredCard.size = {
-        cols: Math.min(basePub.baseSize.cols + 1, 7),
-        rows: Math.min(basePub.baseSize.rows + 1, 7)
-      };
-
-      // Adjust other cards to avoid overlap
-      for (let i = 0; i < newPositions.length; i++) {
-        if (i === hoveredIndex) continue;
-
-        const currentCard = newPositions[i];
-        let hasOverlap = checkOverlap(
-          hoveredCard.position,
-          hoveredCard.size,
-          currentCard.position,
-          currentCard.size
-        );
-
-        if (hasOverlap) {
-          // Try moving the card to the right first
-          const newPositionRight = {
-            col: hoveredCard.position.col + hoveredCard.size.cols,
-            row: currentCard.position.row
-          };
-          
-          // Check if new position is valid (within grid bounds and no overlap with others)
-          let isValidRight = newPositionRight.col + currentCard.size.cols <= 17; // 16 columns + 1
-          if (isValidRight) {
-            let hasConflict = false;
-            for (let j = 0; j < newPositions.length; j++) {
-              if (j === i || j === hoveredIndex) continue;
-              if (checkOverlap(newPositionRight, currentCard.size, newPositions[j].position, newPositions[j].size)) {
-                hasConflict = true;
-                break;
-              }
-            }
-            if (!hasConflict) {
-              currentCard.position = newPositionRight;
-              continue;
-            }
-          }
-
-          // Try moving down
-          const newPositionDown = {
-            col: currentCard.position.col,
-            row: hoveredCard.position.row + hoveredCard.size.rows
-          };
-          
-          let isValidDown = true; // No row limit for now
-          if (isValidDown) {
-            let hasConflict = false;
-            for (let j = 0; j < newPositions.length; j++) {
-              if (j === i || j === hoveredIndex) continue;
-              if (checkOverlap(newPositionDown, currentCard.size, newPositions[j].position, newPositions[j].size)) {
-                hasConflict = true;
-                break;
-              }
-            }
-            if (!hasConflict) {
-              currentCard.position = newPositionDown;
-            }
-          }
-        }
-      }
-
-      return newPositions;
-    });
+    const initialPositions = publications.map((pub) => ({
+      size: { ...pub.baseSize },
+      position: { ...pub.basePosition }
+    }));
+    setCardPositions(initialPositions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hoveredIndex]);
+  }, []);
 
   return (
     <section className="et_pb_section publications-gallery-section">
@@ -189,15 +98,42 @@ function PublicationsGallery() {
             position: publication.basePosition
           };
           
+          // Calculate gentle nudge for other cards when one is hovered
+          const isHovered = hoveredIndex === index;
+          const shouldNudge = hoveredIndex !== null && hoveredIndex !== index;
+          const hoveredCard = hoveredIndex !== null ? cardPositions[hoveredIndex] : null;
+          
+          let nudgeX = 0;
+          let nudgeY = 0;
+          
+          if (shouldNudge && hoveredCard) {
+            // Check if this card is near the hovered card
+            const thisEndCol = position.position.col + position.size.cols;
+            const thisEndRow = position.position.row + position.size.rows;
+            const hoveredEndCol = hoveredCard.position.col + hoveredCard.size.cols;
+            const hoveredEndRow = hoveredCard.position.row + hoveredCard.size.rows;
+            
+            // Gentle nudge away from hovered card
+            if (position.position.col < hoveredEndCol && thisEndCol > hoveredCard.position.col) {
+              // Overlap horizontally - nudge right
+              nudgeX = 8;
+            }
+            if (position.position.row < hoveredEndRow && thisEndRow > hoveredCard.position.row) {
+              // Overlap vertically - nudge down
+              nudgeY = 8;
+            }
+          }
+          
           return (
             <div 
               key={index}
               ref={refs[index]} 
-              className={`et_pb_image publication-image publication-image-${index} ${hoveredIndex === index ? 'is-hovered' : ''}`}
+              className={`et_pb_image publication-image publication-image-${index} ${isHovered ? 'is-hovered' : ''}`}
               style={{
                 gridColumn: `${position.position.col} / span ${position.size.cols}`,
                 gridRow: `${position.position.row} / span ${position.size.rows}`,
-                transition: 'all 0.3s ease'
+                transform: `translate(${nudgeX}px, ${nudgeY}px)`,
+                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
               }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}

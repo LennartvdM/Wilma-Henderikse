@@ -1,9 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Publicaties from './pages/Publicaties';
 import NotFound from './pages/NotFound';
 import './App.css';
+
+// Use HashRouter if environment variable is set, otherwise use BrowserRouter
+// Set REACT_APP_USE_HASH_ROUTER=true if your hosting doesn't support server-side redirects
+const Router = process.env.REACT_APP_USE_HASH_ROUTER === 'true' ? HashRouter : BrowserRouter;
 
 function App() {
   return (

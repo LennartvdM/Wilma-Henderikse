@@ -1,0 +1,157 @@
+.publications-gallery-section {
+  background-color: #f7f7f7;
+  padding: 0 5% 50px;
+  margin-top: -41px;
+  margin-bottom: 0;
+}
+
+.publications-gallery-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.publications-gallery-column-left {
+  flex: 0 0 50%;
+  padding: 0;
+}
+
+.publications-gallery-column-right {
+  flex: 0 0 50%;
+  padding-top: 140px;
+  padding-left: 10%;
+}
+
+.publications-gallery-row-inner-0 {
+  margin-top: 100px;
+  padding-bottom: 0;
+}
+
+.publications-gallery-row-inner-1 {
+  margin-top: 0;
+}
+
+.publications-gallery-row-inner-2 {
+  margin-top: -100px;
+  padding-bottom: 0;
+}
+
+.publications-gallery-column-inner {
+  width: 100%;
+}
+
+.publications-gallery-column-inner-2 {
+  flex: 0 0 50%;
+}
+
+.publications-gallery-column-inner-3 {
+  flex: 0 0 50%;
+}
+
+.publication-image {
+  margin-bottom: 10px;
+  max-width: 100%;
+}
+
+.publication-image-0 {
+  margin-left: 0;
+}
+
+.publication-image-0 .et_pb_image_wrap,
+.publication-image-0 img {
+  width: 100%;
+}
+
+.publication-image-1 {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 10px;
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-left: 0;
+  max-width: 100%;
+}
+
+.publication-image-1 .et_pb_image_wrap,
+.publication-image-1 img {
+  width: 100%;
+}
+
+.publication-image-2 {
+  margin-top: -134px;
+  max-width: 100%;
+  margin-left: 0;
+}
+
+.publication-image-2 .et_pb_image_wrap,
+.publication-image-2 img {
+  width: 100%;
+}
+
+.publication-image-3 {
+  margin-left: 0;
+  padding-bottom: 10px;
+}
+
+.publication-image-4 {
+  padding-bottom: 10px;
+  margin-left: 0;
+}
+
+.publication-image-5 {
+  padding-bottom: 10px;
+  max-width: 100%;
+  margin-left: 0;
+}
+
+.publication-image-5 .et_pb_image_wrap,
+.publication-image-5 img {
+  width: 100%;
+}
+
+.publication-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  box-shadow: inset 0px 0px 0px 10px #f7f7f7;
+}
+
+.publication-image a {
+  display: block;
+  text-decoration: none;
+}
+
+.publication-image a:hover img {
+  opacity: 0.9;
+}
+
+@media (max-width: 980px) {
+  .publications-gallery-column-left,
+  .publications-gallery-column-right {
+    flex: 0 0 100%;
+  }
+  
+  .publications-gallery-column-right {
+    padding-top: 40px;
+    padding-left: 0;
+  }
+  
+  .publication-image-2 {
+    margin-top: 0;
+  }
+  
+  .publications-gallery-row-inner-2 {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .publications-gallery-section {
+    padding: 0 20px 50px;
+  }
+  
+  .publications-gallery-column-inner-2,
+  .publications-gallery-column-inner-3 {
+    flex: 0 0 100%;
+  }
+}
+

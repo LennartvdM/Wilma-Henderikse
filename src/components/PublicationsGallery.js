@@ -54,32 +54,7 @@ function PublicationsGallery() {
 
   const refs = [image0Ref, image1Ref, image2Ref, image3Ref, image4Ref, image5Ref];
 
-  // Check if two grid areas overlap
-  const checkOverlap = (pos1, size1, pos2, size2) => {
-    const end1Col = pos1.col + size1.cols;
-    const end1Row = pos1.row + size1.rows;
-    const end2Col = pos2.col + size2.cols;
-    const end2Row = pos2.row + size2.rows;
-
-    return !(
-      end1Col <= pos2.col ||
-      pos1.col >= end2Col ||
-      end1Row <= pos2.row ||
-      pos1.row >= end2Row
-    );
-  };
-
   // Initialize positions
-  useEffect(() => {
-    const initialPositions = publications.map((pub) => ({
-      size: { ...pub.baseSize },
-      position: { ...pub.basePosition }
-    }));
-    setCardPositions(initialPositions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Initialize positions - no need to recalculate on hover anymore
   useEffect(() => {
     const initialPositions = publications.map((pub) => ({
       size: { ...pub.baseSize },

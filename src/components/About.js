@@ -2,6 +2,8 @@ import React from 'react';
 import './About.css';
 
 function About() {
+  const lepelaarImage = `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/lepelaar-11.png`;
+
   return (
     <>
       <section className="et_pb_section about-section">
@@ -27,14 +29,17 @@ function About() {
           <div className="et_pb_column about-column-right">
             <div className="et_pb_image about-image">
               <span className="et_pb_image_wrap">
-                <img src="/wp-content/uploads/2018/10/Lepelaar-11.png" alt="Lepelaar" />
+                <img src={lepelaarImage} alt="Lepelaar" />
               </span>
             </div>
           </div>
         </div>
       </section>
-      <section className="et_pb_section about-parallax-section">
-        <div className="et_parallax_bg"></div>
+      <section
+        className="et_pb_section about-parallax-section"
+        style={{ '--about-bg': `url(${lepelaarImage})` }}
+      >
+        <div className="et_parallax_bg" style={{ backgroundImage: `url(${lepelaarImage})` }}></div>
         <div className="et_pb_row about-parallax-row">
           <div className="et_pb_column about-parallax-column"></div>
           <div className="et_pb_column about-parallax-column"></div>

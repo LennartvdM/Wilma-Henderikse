@@ -1,7 +1,7 @@
 .hero-section {
   padding: 0;
   background-color: #fcd21d;
-  background-image: url('/wp-content/uploads/2018/10/background-texture.jpg');
+  background-image: var(--hero-bg, none);
   background-blend-mode: multiply;
   background-size: cover;
   background-position: center;

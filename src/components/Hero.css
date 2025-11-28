@@ -10,7 +10,8 @@
 .hero-row {
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: stretch;
 }
 
@@ -68,6 +69,11 @@
 }
 
 @media (max-width: 767px) {
+  .hero-row {
+    flex-direction: column;
+    flex-wrap: wrap;
+  }
+  
   .hero-column {
     flex: 0 0 100%;
     padding: 10% 8%;

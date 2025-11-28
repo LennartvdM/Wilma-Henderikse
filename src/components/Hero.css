@@ -18,8 +18,11 @@
   padding: 10% 8%;
 }
 
-.hero-column-empty {
+.hero-column-portrait {
   flex: 0 0 50%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .hero-text {

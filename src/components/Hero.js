@@ -3,6 +3,7 @@ import './Hero.css';
 
 function Hero() {
   const heroBackground = `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/background-texture.jpg`;
+  const portraitImage = `${process.env.PUBLIC_URL}/wp-content/uploads/2018/11/wilma-6.png`;
 
   return (
     <section
@@ -27,7 +28,10 @@ function Hero() {
             </div>
           </div>
         </div>
-        <div className="et_pb_column hero-column-empty"></div>
+        <div 
+          className="et_pb_column hero-column-portrait"
+          style={{ backgroundImage: `url(${portraitImage})` }}
+        ></div>
       </div>
     </section>
   );

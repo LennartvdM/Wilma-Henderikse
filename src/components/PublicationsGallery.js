@@ -54,15 +54,6 @@ function PublicationsGallery() {
 
   const refs = [image0Ref, image1Ref, image2Ref, image3Ref, image4Ref, image5Ref];
 
-  // Initialize positions
-  useEffect(() => {
-    const initialPositions = publications.map((pub) => ({
-      size: { ...pub.baseSize },
-      position: { ...pub.basePosition }
-    }));
-    setCardPositions(initialPositions);
-  }, []);
-
   // Check if two grid areas overlap
   const checkOverlap = (pos1, size1, pos2, size2) => {
     const end1Col = pos1.col + size1.cols;
@@ -78,6 +69,16 @@ function PublicationsGallery() {
     );
   };
 
+  // Initialize positions
+  useEffect(() => {
+    const initialPositions = publications.map((pub) => ({
+      size: { ...pub.baseSize },
+      position: { ...pub.basePosition }
+    }));
+    setCardPositions(initialPositions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Recalculate positions when a card is hovered
   useEffect(() => {
     if (hoveredIndex === null) {
@@ -90,86 +91,93 @@ function PublicationsGallery() {
       return;
     }
 
-    // Get current positions or initialize from base
-    const currentPositions = cardPositions.length > 0 
-      ? [...cardPositions]
-      : publications.map((pub) => ({
-          size: { ...pub.baseSize },
-          position: { ...pub.basePosition }
-        }));
-    
-    const newPositions = [...currentPositions];
-    if (newPositions.length === 0) return;
-    
-    const hoveredCard = newPositions[hoveredIndex];
-    const basePub = publications[hoveredIndex];
-    
-    // Grow the hovered card
-    hoveredCard.size = {
-      cols: Math.min(basePub.baseSize.cols + 1, 7),
-      rows: Math.min(basePub.baseSize.rows + 1, 7)
-    };
+    setCardPositions((prevPositions) => {
+      // Get current positions or initialize from base
+      const currentPositions = prevPositions.length > 0 
+        ? prevPositions.map(pos => ({ ...pos, size: { ...pos.size }, position: { ...pos.position } }))
+        : publications.map((pub) => ({
+            size: { ...pub.baseSize },
+            position: { ...pub.basePosition }
+          }));
+      
+      const newPositions = currentPositions.map(pos => ({
+        size: { ...pos.size },
+        position: { ...pos.position }
+      }));
+      
+      if (newPositions.length === 0) return prevPositions;
+      
+      const hoveredCard = newPositions[hoveredIndex];
+      const basePub = publications[hoveredIndex];
+      
+      // Grow the hovered card
+      hoveredCard.size = {
+        cols: Math.min(basePub.baseSize.cols + 1, 7),
+        rows: Math.min(basePub.baseSize.rows + 1, 7)
+      };
 
-    // Adjust other cards to avoid overlap
-    for (let i = 0; i < newPositions.length; i++) {
-      if (i === hoveredIndex) continue;
+      // Adjust other cards to avoid overlap
+      for (let i = 0; i < newPositions.length; i++) {
+        if (i === hoveredIndex) continue;
 
-      const currentCard = newPositions[i];
-      let hasOverlap = checkOverlap(
-        hoveredCard.position,
-        hoveredCard.size,
-        currentCard.position,
-        currentCard.size
-      );
+        const currentCard = newPositions[i];
+        let hasOverlap = checkOverlap(
+          hoveredCard.position,
+          hoveredCard.size,
+          currentCard.position,
+          currentCard.size
+        );
 
-      if (hasOverlap) {
-        // Try moving the card to the right first
-        const newPositionRight = {
-          col: hoveredCard.position.col + hoveredCard.size.cols,
-          row: currentCard.position.row
-        };
-        
-        // Check if new position is valid (within grid bounds and no overlap with others)
-        let isValidRight = newPositionRight.col + currentCard.size.cols <= 17; // 16 columns + 1
-        if (isValidRight) {
-          let hasConflict = false;
-          for (let j = 0; j < newPositions.length; j++) {
-            if (j === i || j === hoveredIndex) continue;
-            if (checkOverlap(newPositionRight, currentCard.size, newPositions[j].position, newPositions[j].size)) {
-              hasConflict = true;
-              break;
+        if (hasOverlap) {
+          // Try moving the card to the right first
+          const newPositionRight = {
+            col: hoveredCard.position.col + hoveredCard.size.cols,
+            row: currentCard.position.row
+          };
+          
+          // Check if new position is valid (within grid bounds and no overlap with others)
+          let isValidRight = newPositionRight.col + currentCard.size.cols <= 17; // 16 columns + 1
+          if (isValidRight) {
+            let hasConflict = false;
+            for (let j = 0; j < newPositions.length; j++) {
+              if (j === i || j === hoveredIndex) continue;
+              if (checkOverlap(newPositionRight, currentCard.size, newPositions[j].position, newPositions[j].size)) {
+                hasConflict = true;
+                break;
+              }
+            }
+            if (!hasConflict) {
+              currentCard.position = newPositionRight;
+              continue;
             }
           }
-          if (!hasConflict) {
-            currentCard.position = newPositionRight;
-            continue;
-          }
-        }
 
-        // Try moving down
-        const newPositionDown = {
-          col: currentCard.position.col,
-          row: hoveredCard.position.row + hoveredCard.size.rows
-        };
-        
-        let isValidDown = true; // No row limit for now
-        if (isValidDown) {
-          let hasConflict = false;
-          for (let j = 0; j < newPositions.length; j++) {
-            if (j === i || j === hoveredIndex) continue;
-            if (checkOverlap(newPositionDown, currentCard.size, newPositions[j].position, newPositions[j].size)) {
-              hasConflict = true;
-              break;
+          // Try moving down
+          const newPositionDown = {
+            col: currentCard.position.col,
+            row: hoveredCard.position.row + hoveredCard.size.rows
+          };
+          
+          let isValidDown = true; // No row limit for now
+          if (isValidDown) {
+            let hasConflict = false;
+            for (let j = 0; j < newPositions.length; j++) {
+              if (j === i || j === hoveredIndex) continue;
+              if (checkOverlap(newPositionDown, currentCard.size, newPositions[j].position, newPositions[j].size)) {
+                hasConflict = true;
+                break;
+              }
             }
-          }
-          if (!hasConflict) {
-            currentCard.position = newPositionDown;
+            if (!hasConflict) {
+              currentCard.position = newPositionDown;
+            }
           }
         }
       }
-    }
 
-    setCardPositions(newPositions);
+      return newPositions;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hoveredIndex]);
 
   return (

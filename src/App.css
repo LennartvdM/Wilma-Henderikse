@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 .App {
@@ -6,19 +6,14 @@
   min-height: 100vh;
 }
 
-/* Global Divi-style classes */
+/* Global Divi-style classes - kept for compatibility */
 .et_pb_section {
   position: relative;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
 }
 
 .et_pb_row {
   position: relative;
   width: 100%;
-  max-width: 1080px;
-  margin: 0 auto;
 }
 
 .et_pb_column {
@@ -46,32 +41,4 @@
   display: block;
   max-width: 100%;
   height: auto;
-}
-
-/* Responsive utilities */
-@media only screen and (min-width: 1350px) {
-  .et_pb_row {
-    padding: 27px 0;
-  }
-  
-  .et_pb_section {
-    padding: 54px 0;
-  }
-}
-
-@media only screen and (min-width: 981px) {
-  .et_pb_row {
-    display: flex;
-    flex-wrap: wrap;
-  }
-}
-
-@media only screen and (max-width: 980px) {
-  .et_pb_row {
-    flex-direction: column;
-  }
-  
-  .et_pb_column {
-    width: 100% !important;
-  }
 }

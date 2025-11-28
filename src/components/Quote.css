@@ -1,40 +1,134 @@
 .quote-section {
-  background-color: #f7f7f7;
-  padding-top: 0;
-  padding-bottom: 156px;
+  background: linear-gradient(to bottom, var(--light-gray) 0%, var(--white) 100%);
+  padding: var(--spacing-xl) var(--spacing-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.quote-section::before {
+  content: '"';
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12rem;
+  font-family: Georgia, serif;
+  color: var(--primary-yellow);
+  opacity: 0.1;
+  font-weight: 700;
+  line-height: 1;
+  z-index: 0;
 }
 
 .quote-row {
-  margin-bottom: 40px;
-  padding: 27px 0;
+  margin-bottom: 0;
+  padding: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .quote-column {
   width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .quote-text {
   text-align: center;
+  padding: var(--spacing-lg) 0;
 }
 
 .quote-text h2 {
-  font-family: inherit;
-  font-weight: normal;
+  font-family: var(--font-primary);
+  font-weight: 300;
   font-style: italic;
-  margin-bottom: 20px;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  position: relative;
+  padding: 0 var(--spacing-md);
+}
+
+.quote-text h2::before,
+.quote-text h2::after {
+  content: '"';
+  font-size: 4rem;
+  color: var(--primary-yellow);
+  opacity: 0.3;
+  font-family: Georgia, serif;
+  line-height: 0;
+  position: absolute;
+}
+
+.quote-text h2::before {
+  top: -1rem;
+  left: -2rem;
+}
+
+.quote-text h2::after {
+  bottom: -2rem;
+  right: -2rem;
 }
 
 .quote-text h1 {
-  font-size: x-large;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 2rem;
 }
 
 .quote-text a {
-  color: inherit;
+  color: var(--accent-orange);
   text-decoration: none;
+  transition: all var(--transition-base);
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.quote-text a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent-orange);
+  transition: width var(--transition-base);
 }
 
 .quote-text a:hover {
-  text-decoration: underline;
+  color: var(--primary-yellow-dark);
 }
+
+.quote-text a:hover::after {
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .quote-section {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
+  
+  .quote-section::before {
+    font-size: 8rem;
+    top: 1rem;
+  }
+  
+  .quote-text h2::before,
+  .quote-text h2::after {
+    font-size: 2.5rem;
+  }
+  
+  .quote-text h2::before {
+    left: -1rem;
+  }
+  
+  .quote-text h2::after {
+    right: -1rem;
+  }
+}
+
+
 
 

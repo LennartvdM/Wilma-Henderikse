@@ -30,3 +30,5 @@ export function getFilenameFromPath(path) {
 export const PUBLICATIONS_PATH = '/wp-content/uploads/publications/';
 
 
+
+

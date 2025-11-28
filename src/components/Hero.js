@@ -37,7 +37,10 @@ function Hero() {
         </div>
         <div 
           className="et_pb_column hero-column-portrait"
-          style={{ backgroundImage: `url(${portraitImage})` }}
+          style={{ 
+            backgroundImage: `url(${portraitImage})`,
+            minHeight: '100vh'
+          }}
         ></div>
       </div>
     </section>

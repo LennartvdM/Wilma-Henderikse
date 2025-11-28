@@ -3,7 +3,7 @@
 ## Quick Diagnosis
 
 Run the routing test:
-```bash
+```powershell
 npm run test-routing
 ```
 
@@ -12,12 +12,12 @@ npm run test-routing
 ### Issue 1: Redirect files not in build folder
 
 **Solution:** After building, redirect files should automatically be copied from `public/` to `build/`. Verify:
-```bash
+```powershell
 npm run build
-# Then check:
-# - build/_redirects exists
-# - build/.htaccess exists  
-# - build/web.config exists
+# Then check in PowerShell:
+Test-Path "build\_redirects"
+Test-Path "build\.htaccess"
+Test-Path "build\web.config"
 ```
 
 ### Issue 2: Hosting platform doesn't support redirects
@@ -30,7 +30,7 @@ REACT_APP_USE_HASH_ROUTER=true
 ```
 
 2. Rebuild:
-```bash
+```powershell
 npm run build
 ```
 
@@ -61,12 +61,14 @@ This usually means:
 ## Testing Your Fix
 
 1. Build the site: `npm run build`
-2. Check build folder contains:
-   - `index.html`
-   - `_redirects` (for Netlify)
-   - `.htaccess` (for Apache)
-   - `web.config` (for IIS)
-3. Deploy the `build/` folder
+2. Check build folder contains (Windows PowerShell):
+   ```powershell
+   Test-Path "build\index.html"
+   Test-Path "build\_redirects"
+   Test-Path "build\.htaccess"
+   Test-Path "build\web.config"
+   ```
+3. Deploy the `build\` folder
 4. Test routes:
    - `/` should work
    - `/publicaties` should work (not 404)

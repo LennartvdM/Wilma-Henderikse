@@ -7,14 +7,17 @@ If you're experiencing 404 errors on routes like `/publicaties`, follow these st
 If server-side redirects aren't working, you can use HashRouter instead. This uses `#` in URLs but works on all hosting platforms without configuration.
 
 To enable HashRouter, set this environment variable before building:
-```bash
-REACT_APP_USE_HASH_ROUTER=true npm run build
+
+**Windows PowerShell:**
+```powershell
+$env:REACT_APP_USE_HASH_ROUTER="true"; npm run build
 ```
 
-Or add to `.env`:
+**Or create a `.env` file in the root:**
 ```
 REACT_APP_USE_HASH_ROUTER=true
 ```
+Then run: `npm run build`
 
 ## Platform-Specific Solutions
 

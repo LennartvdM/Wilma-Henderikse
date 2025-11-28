@@ -20,12 +20,12 @@ This is a React conversion of the original WordPress site for Wilma Henderikse. 
 ### Installation
 
 1. Install dependencies:
-```bash
+```powershell
 npm install
 ```
 
 2. Start the development server:
-```bash
+```powershell
 npm start
 ```
 
@@ -35,8 +35,14 @@ npm start
 
 To create a production build:
 
-```bash
+```powershell
 npm run build
+```
+
+To check if the build has all required files:
+
+```powershell
+npm run check-build
 ```
 
 This creates an optimized production build in the `build` folder.

@@ -14,7 +14,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test-routing": "node scripts/test-routing.js"
+    "test-routing": "node scripts/test-routing.js",
+    "check-build": "powershell -ExecutionPolicy Bypass -File scripts/check-build.ps1"
   },
   "eslintConfig": {
     "extends": [

@@ -293,7 +293,6 @@ function PublicationsGallery() {
           // For horizontal adjacency, add staggered positions
           const placedCardTop = placedCard.position.row;
           const placedCardBottom = placedCard.position.row + placedCard.size.rows;
-          const placedCardCenterRow = placedCard.position.row + placedCard.size.rows / 2;
           
           // Left side - staggered positions
           baseCandidates.push(

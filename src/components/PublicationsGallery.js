@@ -159,35 +159,45 @@ function PublicationsGallery() {
       if (isAdjacent) {
         adjacencyBonus = 30;
         
-        // Large card rules: penalize vertical stacking, bonus for horizontal arrangement
+        // Large card rules: penalize vertical stacking, enforce horizontal staggered arrangement
         if (isLargeCard && isPlacedCardLarge) {
           if (verticallyAdjacent) {
-            // Large cards stacked vertically - apply heavy penalty
-            largeCardVerticalPenalty = -100;
+            // Large cards stacked vertically - apply very heavy penalty
+            largeCardVerticalPenalty = -200;
           } else if (horizontallyAdjacent) {
-            // Large cards arranged horizontally - apply bonus
-            largeCardHorizontalBonus = 50;
-            
-            // Bonus for staggered alignment: one card's center aligns with other's edge
+            // Large cards arranged horizontally - check for staggered alignment
             const cardCenterRow = position.row + size.rows / 2;
+            const cardTop = position.row;
+            const cardBottom = position.row + size.rows;
             const placedCardTop = placedCard.position.row;
             const placedCardBottom = placedCard.position.row + placedCard.size.rows;
             const placedCardCenterRow = placedCard.position.row + placedCard.size.rows / 2;
             
-            // Check if this card's center aligns with placed card's top or bottom edge
-            const centerAlignsWithTop = Math.abs(cardCenterRow - placedCardTop) < 1;
-            const centerAlignsWithBottom = Math.abs(cardCenterRow - placedCardBottom) < 1;
+            // Check if this card's center aligns with placed card's top or bottom edge (within 0.5 grid cells)
+            const centerAlignsWithTop = Math.abs(cardCenterRow - placedCardTop) < 0.5;
+            const centerAlignsWithBottom = Math.abs(cardCenterRow - placedCardBottom) < 0.5;
             
             // Check if placed card's center aligns with this card's top or bottom edge
-            const placedCenterAlignsWithTop = Math.abs(placedCardCenterRow - position.row) < 1;
-            const placedCenterAlignsWithBottom = Math.abs(placedCardCenterRow - (position.row + size.rows)) < 1;
+            const placedCenterAlignsWithTop = Math.abs(placedCardCenterRow - cardTop) < 0.5;
+            const placedCenterAlignsWithBottom = Math.abs(placedCardCenterRow - cardBottom) < 0.5;
             
-            if (centerAlignsWithTop || centerAlignsWithBottom || placedCenterAlignsWithTop || placedCenterAlignsWithBottom) {
-              // Staggered alignment bonus - cards meet halfway
-              largeCardHorizontalBonus += 40;
+            const isStaggered = centerAlignsWithTop || centerAlignsWithBottom || placedCenterAlignsWithTop || placedCenterAlignsWithBottom;
+            
+            // Check if cards are perfectly parallel (centers aligned or top/bottom edges aligned)
+            const centersAligned = Math.abs(cardCenterRow - placedCardCenterRow) < 1;
+            const topsAligned = Math.abs(cardTop - placedCardTop) < 1;
+            const bottomsAligned = Math.abs(cardBottom - placedCardBottom) < 1;
+            const isParallel = centersAligned || (topsAligned && bottomsAligned);
+            
+            if (isStaggered) {
+              // Staggered alignment - strong bonus (cards meet halfway)
+              largeCardHorizontalBonus = 150;
+            } else if (isParallel) {
+              // Perfectly parallel - very heavy penalty to force staggered alignment
+              largeCardHorizontalBonus = -150;
             } else {
-              // Perfectly parallel - small penalty to encourage staggered alignment
-              largeCardHorizontalBonus -= 20;
+              // Somewhat offset but not perfectly staggered - small bonus
+              largeCardHorizontalBonus = 30;
             }
           }
         }
@@ -213,8 +223,8 @@ function PublicationsGallery() {
              placedCard.position.row + placedCard.size.rows <= position.row);
           
           if (isVerticallyStacked) {
-            // Apply penalty for vertical stacking of large cards
-            largeCardVerticalPenalty = Math.max(largeCardVerticalPenalty, -80);
+            // Apply very heavy penalty for vertical stacking of large cards
+            largeCardVerticalPenalty = Math.max(largeCardVerticalPenalty, -150);
           }
         }
       }
@@ -254,9 +264,12 @@ function PublicationsGallery() {
     });
     
     // Place remaining cards with scoring system
+    const LARGE_CARD_THRESHOLD_PLACE = 20;
+    
     for (let i = 1; i < sortedCards.length; i++) {
       const card = sortedCards[i];
       const cardArea = card.size.cols * card.size.rows;
+      const isLargeCard = cardArea >= LARGE_CARD_THRESHOLD_PLACE;
       let bestPosition = null;
       let bestScore = -Infinity;
       
@@ -264,13 +277,38 @@ function PublicationsGallery() {
       const candidates = [];
       
       for (const placedCard of placedCards) {
+        const placedCardArea = placedCard.size.cols * placedCard.size.rows;
+        const isPlacedCardLarge = placedCardArea >= LARGE_CARD_THRESHOLD_PLACE;
+        
         // Directly adjacent positions (no gap)
-        candidates.push(
+        const baseCandidates = [
           { col: placedCard.position.col - card.size.cols, row: placedCard.position.row },
           { col: placedCard.position.col, row: placedCard.position.row - card.size.rows },
           { col: placedCard.position.col + placedCard.size.cols, row: placedCard.position.row },
           { col: placedCard.position.col, row: placedCard.position.row + placedCard.size.rows }
-        );
+        ];
+        
+        // If both cards are large, add staggered positions for horizontal adjacency
+        if (isLargeCard && isPlacedCardLarge) {
+          // For horizontal adjacency, add staggered positions
+          const placedCardTop = placedCard.position.row;
+          const placedCardBottom = placedCard.position.row + placedCard.size.rows;
+          const placedCardCenterRow = placedCard.position.row + placedCard.size.rows / 2;
+          
+          // Left side - staggered positions
+          baseCandidates.push(
+            { col: placedCard.position.col - card.size.cols, row: placedCardTop - Math.floor(card.size.rows / 2) },
+            { col: placedCard.position.col - card.size.cols, row: placedCardBottom - Math.floor(card.size.rows / 2) }
+          );
+          
+          // Right side - staggered positions
+          baseCandidates.push(
+            { col: placedCard.position.col + placedCard.size.cols, row: placedCardTop - Math.floor(card.size.rows / 2) },
+            { col: placedCard.position.col + placedCard.size.cols, row: placedCardBottom - Math.floor(card.size.rows / 2) }
+          );
+        }
+        
+        candidates.push(...baseCandidates);
       }
       
       // Score all valid candidate positions
@@ -398,6 +436,91 @@ function PublicationsGallery() {
       
       // If no improvements, stop early
       if (!improved) break;
+    }
+    
+    // Large card staggered alignment optimization: enforce horizontal staggered arrangement
+    const LARGE_CARD_THRESHOLD_OPT = 20;
+    const largeCards = placedCards
+      .map((card, idx) => ({ card, idx, area: card.size.cols * card.size.rows }))
+      .filter(({ area }) => area >= LARGE_CARD_THRESHOLD_OPT)
+      .sort((a, b) => b.area - a.area);
+    
+    if (largeCards.length >= 2) {
+      // Try to fix staggered alignment for large cards
+      for (let attempt = 0; attempt < 3; attempt++) {
+        let fixed = false;
+        
+        for (let i = 0; i < largeCards.length; i++) {
+          for (let j = i + 1; j < largeCards.length; j++) {
+            const card1 = largeCards[i];
+            const card2 = largeCards[j];
+            
+            // Check if they're horizontally adjacent
+            const card1EndCol = card1.card.position.col + card1.card.size.cols;
+            const card2EndCol = card2.card.position.col + card2.card.size.cols;
+            const horizontallyAdjacent = 
+              (card1EndCol === card2.card.position.col || card2EndCol === card1.card.position.col) &&
+              (card1.card.position.row < card2.card.position.row + card2.card.size.rows &&
+               card1.card.position.row + card1.card.size.rows > card2.card.position.row);
+            
+            if (horizontallyAdjacent) {
+              // Check if they're staggered
+              const card1CenterRow = card1.card.position.row + card1.card.size.rows / 2;
+              const card2CenterRow = card2.card.position.row + card2.card.size.rows / 2;
+              const card1Top = card1.card.position.row;
+              const card1Bottom = card1.card.position.row + card1.card.size.rows;
+              const card2Top = card2.card.position.row;
+              const card2Bottom = card2.card.position.row + card2.card.size.rows;
+              
+              const isStaggered = 
+                Math.abs(card1CenterRow - card2Top) < 0.5 ||
+                Math.abs(card1CenterRow - card2Bottom) < 0.5 ||
+                Math.abs(card2CenterRow - card1Top) < 0.5 ||
+                Math.abs(card2CenterRow - card1Bottom) < 0.5;
+              
+              const isParallel = Math.abs(card1CenterRow - card2CenterRow) < 1 ||
+                (Math.abs(card1Top - card2Top) < 1 && Math.abs(card1Bottom - card2Bottom) < 1);
+              
+              // If parallel, try to fix by moving one card to create stagger
+              if (isParallel && !isStaggered) {
+                const otherCards = placedCards.filter((_, idx) => idx !== card1.idx && idx !== card2.idx);
+                
+                // Try moving card2 to align its center with card1's top or bottom
+                const staggerPositions = [
+                  { col: card2.card.position.col, row: card1Top - Math.floor(card2.card.size.rows / 2) },
+                  { col: card2.card.position.col, row: card1Bottom - Math.floor(card2.card.size.rows / 2) }
+                ];
+                
+                for (const newPos of staggerPositions) {
+                  if (isValidPosition(newPos, card2.card.size, otherCards.concat([card1.card]))) {
+                    placedCards[card2.idx].position = newPos;
+                    fixed = true;
+                    break;
+                  }
+                }
+                
+                if (!fixed) {
+                  // Try moving card1 instead
+                  const staggerPositions2 = [
+                    { col: card1.card.position.col, row: card2Top - Math.floor(card1.card.size.rows / 2) },
+                    { col: card1.card.position.col, row: card2Bottom - Math.floor(card1.card.size.rows / 2) }
+                  ];
+                  
+                  for (const newPos of staggerPositions2) {
+                    if (isValidPosition(newPos, card1.card.size, otherCards.concat([card2.card]))) {
+                      placedCards[card1.idx].position = newPos;
+                      fixed = true;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        if (!fixed) break;
+      }
     }
     
     // Center-pull optimization: magnetically pull cards toward center if space exists

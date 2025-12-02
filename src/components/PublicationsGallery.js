@@ -128,7 +128,17 @@ function PublicationsGallery() {
     
     // Adjacency bonus (snug placement)
     let adjacencyBonus = 0;
+    let largeCardVerticalPenalty = 0;
+    let largeCardHorizontalBonus = 0;
+    
+    // Define threshold for "large" cards (e.g., area >= 20)
+    const LARGE_CARD_THRESHOLD = 20;
+    const isLargeCard = cardArea >= LARGE_CARD_THRESHOLD;
+    
     for (const placedCard of placedCards) {
+      const placedCardArea = placedCard.size.cols * placedCard.size.rows;
+      const isPlacedCardLarge = placedCardArea >= LARGE_CARD_THRESHOLD;
+      
       // Check if directly adjacent (no gap)
       // Horizontal adjacency: touching horizontally AND rows overlap
       const horizontallyAdjacent = 
@@ -148,11 +158,47 @@ function PublicationsGallery() {
       
       if (isAdjacent) {
         adjacencyBonus = 30;
+        
+        // Large card rules: penalize vertical stacking, bonus for horizontal arrangement
+        if (isLargeCard && isPlacedCardLarge) {
+          if (verticallyAdjacent) {
+            // Large cards stacked vertically - apply heavy penalty
+            largeCardVerticalPenalty = -100;
+          } else if (horizontallyAdjacent) {
+            // Large cards arranged horizontally - apply bonus
+            largeCardHorizontalBonus = 50;
+          }
+        }
         break;
       }
     }
     
-    return centerScore + proximityScore + adjacencyBonus;
+    // Also check for vertical overlap/stacking even if not directly adjacent
+    if (isLargeCard) {
+      for (const placedCard of placedCards) {
+        const placedCardArea = placedCard.size.cols * placedCard.size.rows;
+        const isPlacedCardLarge = placedCardArea >= LARGE_CARD_THRESHOLD;
+        
+        if (isPlacedCardLarge) {
+          // Check if cards would be vertically stacked (one above/below the other)
+          const verticalOverlap = 
+            (position.col < placedCard.position.col + placedCard.size.cols &&
+             position.col + size.cols > placedCard.position.col);
+          
+          const isVerticallyStacked = 
+            verticalOverlap &&
+            (position.row + size.rows <= placedCard.position.row ||
+             placedCard.position.row + placedCard.size.rows <= position.row);
+          
+          if (isVerticallyStacked) {
+            // Apply penalty for vertical stacking of large cards
+            largeCardVerticalPenalty = Math.max(largeCardVerticalPenalty, -80);
+          }
+        }
+      }
+    }
+    
+    return centerScore + proximityScore + adjacencyBonus + largeCardVerticalPenalty + largeCardHorizontalBonus;
   }, [GRID_COLS, GRID_ROWS]);
 
   // Size-aware density-optimized placement with multi-pass optimization

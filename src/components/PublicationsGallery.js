@@ -93,9 +93,10 @@ function PublicationsGallery() {
   }, [GRID_COLS, GRID_ROWS, doRectsOverlap]);
 
   // Calculate position score: higher = better (considers center preference, size, and clustering)
-  const scorePosition = useCallback((position, size, placedCards, cardArea) => {
-    const centerCol = GRID_COLS / 2;
-    const centerRow = GRID_ROWS / 2;
+  const scorePosition = useCallback((position, size, placedCards, cardArea, centerOffset = { col: 0, row: 0 }) => {
+    // Add small random offset to center to create variation
+    const centerCol = GRID_COLS / 2 + centerOffset.col;
+    const centerRow = GRID_ROWS / 2 + centerOffset.row;
     
     // Card center position
     const cardCenterCol = position.col + size.cols / 2;
@@ -167,9 +168,14 @@ function PublicationsGallery() {
     
     let placedCards = [];
     
-    // Place first (largest) card near center
-    const centerCol = Math.floor(GRID_COLS / 2);
-    const centerRow = Math.floor(GRID_ROWS / 2);
+    // Add random offset to center for variation (between -2 and +2 grid cells)
+    const centerOffsetCol = (Math.random() - 0.5) * 4;
+    const centerOffsetRow = (Math.random() - 0.5) * 4;
+    const centerOffset = { col: centerOffsetCol, row: centerOffsetRow };
+    
+    // Place first (largest) card near center (with offset)
+    const centerCol = Math.floor(GRID_COLS / 2) + Math.round(centerOffsetCol);
+    const centerRow = Math.floor(GRID_ROWS / 2) + Math.round(centerOffsetRow);
     const firstCard = sortedCards[0];
     const startCol = Math.max(1, centerCol - Math.floor(firstCard.size.cols / 2));
     const startRow = Math.max(1, centerRow - Math.floor(firstCard.size.rows / 2));
@@ -202,9 +208,12 @@ function PublicationsGallery() {
       // Score all valid candidate positions
       for (const candidate of candidates) {
         if (isValidPosition(candidate, card.size, placedCards)) {
-          const score = scorePosition(candidate, card.size, placedCards, cardArea);
-          if (score > bestScore) {
-            bestScore = score;
+          const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
+          // Add small random factor (0-5%) to break ties and create variation
+          const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
+          const adjustedScore = score * randomFactor;
+          if (adjustedScore > bestScore) {
+            bestScore = adjustedScore;
             bestPosition = candidate;
           }
         }
@@ -223,9 +232,12 @@ function PublicationsGallery() {
             
             for (const candidate of nearbyCandidates) {
               if (isValidPosition(candidate, card.size, placedCards)) {
-                const score = scorePosition(candidate, card.size, placedCards, cardArea);
-                if (score > bestScore) {
-                  bestScore = score;
+                const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
+                // Add small random factor to break ties
+                const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
+                const adjustedScore = score * randomFactor;
+                if (adjustedScore > bestScore) {
+                  bestScore = adjustedScore;
                   bestPosition = candidate;
                 }
               }
@@ -240,9 +252,12 @@ function PublicationsGallery() {
           for (let col = 1; col <= GRID_COLS - card.size.cols + 1; col++) {
             const candidate = { col, row };
             if (isValidPosition(candidate, card.size, placedCards)) {
-              const score = scorePosition(candidate, card.size, placedCards, cardArea);
-              if (score > bestScore) {
-                bestScore = score;
+              const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
+              // Add small random factor to break ties
+              const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
+              const adjustedScore = score * randomFactor;
+              if (adjustedScore > bestScore) {
+                bestScore = adjustedScore;
                 bestPosition = candidate;
               }
             }
@@ -263,11 +278,18 @@ function PublicationsGallery() {
     for (let pass = 0; pass < MAX_OPTIMIZATION_PASSES; pass++) {
       let improved = false;
       
-      // Try repositioning each card (except the first/largest)
-      for (let i = 1; i < placedCards.length; i++) {
+      // Randomize order of cards to process for variation
+      const cardIndices = Array.from({ length: placedCards.length - 1 }, (_, i) => i + 1);
+      for (let j = cardIndices.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [cardIndices[j], cardIndices[k]] = [cardIndices[k], cardIndices[j]];
+      }
+      
+      // Try repositioning each card (except the first/largest) in random order
+      for (const i of cardIndices) {
         const card = placedCards[i];
         const cardArea = card.size.cols * card.size.rows;
-        const currentScore = scorePosition(card.position, card.size, placedCards.filter((_, idx) => idx !== i), cardArea);
+        const currentScore = scorePosition(card.position, card.size, placedCards.filter((_, idx) => idx !== i), cardArea, centerOffset);
         
         // Temporarily remove this card
         const otherCards = placedCards.filter((_, idx) => idx !== i);
@@ -287,9 +309,12 @@ function PublicationsGallery() {
           
           for (const candidate of candidates) {
             if (isValidPosition(candidate, card.size, otherCards)) {
-              const newScore = scorePosition(candidate, card.size, otherCards, cardArea);
-              if (newScore > bestNewScore) {
-                bestNewScore = newScore;
+              const newScore = scorePosition(candidate, card.size, otherCards, cardArea, centerOffset);
+              // Add small random factor for variation
+              const randomFactor = 1 + (Math.random() - 0.5) * 0.05;
+              const adjustedScore = newScore * randomFactor;
+              if (adjustedScore > bestNewScore) {
+                bestNewScore = adjustedScore;
                 bestNewPosition = candidate;
                 improved = true;
               }
@@ -308,22 +333,31 @@ function PublicationsGallery() {
     }
     
     // Center-pull optimization: magnetically pull cards toward center if space exists
-    // centerCol and centerRow already declared above, reuse them
+    // Use the offset center for consistency
+    const pullCenterCol = centerCol;
+    const pullCenterRow = centerRow;
     const MAX_CENTER_PULL_PASSES = 3;
     
     for (let pass = 0; pass < MAX_CENTER_PULL_PASSES; pass++) {
       let moved = false;
       
-      // Try to move each card closer to center
-      for (let i = 0; i < placedCards.length; i++) {
+      // Randomize order for variation
+      const pullIndices = Array.from({ length: placedCards.length }, (_, i) => i);
+      for (let j = pullIndices.length - 1; j > 0; j--) {
+        const k = Math.floor(Math.random() * (j + 1));
+        [pullIndices[j], pullIndices[k]] = [pullIndices[k], pullIndices[j]];
+      }
+      
+      // Try to move each card closer to center (in random order)
+      for (const i of pullIndices) {
         const card = placedCards[i];
         const cardArea = card.size.cols * card.size.rows;
         const currentCenterCol = card.position.col + card.size.cols / 2;
         const currentCenterRow = card.position.row + card.size.rows / 2;
         
-        // Calculate direction to center
-        const deltaCol = centerCol - currentCenterCol;
-        const deltaRow = centerRow - currentCenterRow;
+        // Calculate direction to center (using offset center)
+        const deltaCol = pullCenterCol - currentCenterCol;
+        const deltaRow = pullCenterRow - currentCenterRow;
         
         // Try moving one step closer to center (in both directions if needed)
         const stepCol = deltaCol > 0 ? 1 : deltaCol < 0 ? -1 : 0;
@@ -335,11 +369,13 @@ function PublicationsGallery() {
           const otherCards = placedCards.filter((_, idx) => idx !== i);
           
           if (isValidPosition(newPosCol, card.size, otherCards)) {
-            const currentScore = scorePosition(card.position, card.size, otherCards, cardArea);
-            const newScore = scorePosition(newPosCol, card.size, otherCards, cardArea);
+            const currentScore = scorePosition(card.position, card.size, otherCards, cardArea, centerOffset);
+            const newScore = scorePosition(newPosCol, card.size, otherCards, cardArea, centerOffset);
             
             // Move if it improves or maintains score (center pull is beneficial)
-            if (newScore >= currentScore * 0.9) { // Allow slight score decrease for center benefit
+            // Add small random variation to threshold
+            const threshold = 0.9 + (Math.random() - 0.5) * 0.1; // 0.85 to 0.95
+            if (newScore >= currentScore * threshold) {
               placedCards[i].position = newPosCol;
               moved = true;
               continue;
@@ -353,11 +389,13 @@ function PublicationsGallery() {
           const otherCards = placedCards.filter((_, idx) => idx !== i);
           
           if (isValidPosition(newPosRow, card.size, otherCards)) {
-            const currentScore = scorePosition(card.position, card.size, otherCards, cardArea);
-            const newScore = scorePosition(newPosRow, card.size, otherCards, cardArea);
+            const currentScore = scorePosition(card.position, card.size, otherCards, cardArea, centerOffset);
+            const newScore = scorePosition(newPosRow, card.size, otherCards, cardArea, centerOffset);
             
             // Move if it improves or maintains score
-            if (newScore >= currentScore * 0.9) {
+            // Add small random variation to threshold
+            const threshold = 0.9 + (Math.random() - 0.5) * 0.1; // 0.85 to 0.95
+            if (newScore >= currentScore * threshold) {
               placedCards[i].position = newPosRow;
               moved = true;
             }

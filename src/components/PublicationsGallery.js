@@ -167,6 +167,28 @@ function PublicationsGallery() {
           } else if (horizontallyAdjacent) {
             // Large cards arranged horizontally - apply bonus
             largeCardHorizontalBonus = 50;
+            
+            // Bonus for staggered alignment: one card's center aligns with other's edge
+            const cardCenterRow = position.row + size.rows / 2;
+            const placedCardTop = placedCard.position.row;
+            const placedCardBottom = placedCard.position.row + placedCard.size.rows;
+            const placedCardCenterRow = placedCard.position.row + placedCard.size.rows / 2;
+            
+            // Check if this card's center aligns with placed card's top or bottom edge
+            const centerAlignsWithTop = Math.abs(cardCenterRow - placedCardTop) < 1;
+            const centerAlignsWithBottom = Math.abs(cardCenterRow - placedCardBottom) < 1;
+            
+            // Check if placed card's center aligns with this card's top or bottom edge
+            const placedCenterAlignsWithTop = Math.abs(placedCardCenterRow - position.row) < 1;
+            const placedCenterAlignsWithBottom = Math.abs(placedCardCenterRow - (position.row + size.rows)) < 1;
+            
+            if (centerAlignsWithTop || centerAlignsWithBottom || placedCenterAlignsWithTop || placedCenterAlignsWithBottom) {
+              // Staggered alignment bonus - cards meet halfway
+              largeCardHorizontalBonus += 40;
+            } else {
+              // Perfectly parallel - small penalty to encourage staggered alignment
+              largeCardHorizontalBonus -= 20;
+            }
           }
         }
         break;

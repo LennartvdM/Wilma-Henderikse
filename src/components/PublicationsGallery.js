@@ -308,8 +308,7 @@ function PublicationsGallery() {
     }
     
     // Center-pull optimization: magnetically pull cards toward center if space exists
-    const centerCol = GRID_COLS / 2;
-    const centerRow = GRID_ROWS / 2;
+    // centerCol and centerRow already declared above, reuse them
     const MAX_CENTER_PULL_PASSES = 3;
     
     for (let pass = 0; pass < MAX_CENTER_PULL_PASSES; pass++) {

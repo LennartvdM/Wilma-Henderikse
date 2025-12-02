@@ -118,7 +118,6 @@
 }
 
 .publication-image.is-hovered {
-  transform: translateY(-4px) scale(1.03) !important;
   box-shadow: var(--shadow-lg);
   z-index: 10;
 }
@@ -173,16 +172,9 @@
   grid-row: 3 / span 3;
 }
 
-/* Remove rotations - keep it clean and fitted */
-.publication-image-1,
-.publication-image-3,
-.publication-image-5 {
-  transform: none;
-}
+/* Transform is now handled inline via JavaScript to avoid conflicts */
 
-.publication-image:hover {
-  transform: translateY(-8px) scale(1.02) !important;
-}
+/* Hover transform is now handled inline via JavaScript to avoid conflicts */
 
 @media (max-width: 1200px) {
   .publications-gallery-row {
@@ -303,15 +295,7 @@
     grid-row: 5 / span 2;
   }
   
-  .publication-image-1,
-  .publication-image-3,
-  .publication-image-5 {
-    transform: none;
-  }
-  
-  .publication-image:hover {
-    transform: translateY(-4px) scale(1.02) !important;
-  }
+  /* Transform is now handled inline via JavaScript to avoid conflicts */
   
   /* Ensure cards fit in 4-column grid */
   .publication-image-0 {

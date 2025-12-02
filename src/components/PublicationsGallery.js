@@ -99,6 +99,17 @@ function PublicationsGallery() {
             }
           }
           
+          // Build transform string based on hover state
+          let transformValue = '';
+          if (isHovered) {
+            // Hovered card: only hover transform, no nudge
+            transformValue = 'translateY(-4px) scale(1.03)';
+          } else if (shouldNudge) {
+            // Other cards: only nudge transform
+            transformValue = `translate(${nudgeX}px, ${nudgeY}px)`;
+          }
+          // If neither hovered nor nudged, transform is empty (no transform)
+          
           return (
             <div 
               key={index}
@@ -107,8 +118,9 @@ function PublicationsGallery() {
               style={{
                 gridColumn: `${position.position.col} / span ${position.size.cols}`,
                 gridRow: `${position.position.row} / span ${position.size.rows}`,
-                transform: `translate(${nudgeX}px, ${nudgeY}px)`,
-                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                ...(transformValue && { transform: transformValue }),
+                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                zIndex: isHovered ? 10 : 'auto'
               }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}

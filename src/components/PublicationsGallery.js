@@ -280,46 +280,91 @@ function PublicationsGallery() {
         const placedCardArea = placedCard.size.cols * placedCard.size.rows;
         const isPlacedCardLarge = placedCardArea >= LARGE_CARD_THRESHOLD_PLACE;
         
-        // Directly adjacent positions (no gap)
-        const baseCandidates = [
-          { col: placedCard.position.col - card.size.cols, row: placedCard.position.row },
-          { col: placedCard.position.col, row: placedCard.position.row - card.size.rows },
-          { col: placedCard.position.col + placedCard.size.cols, row: placedCard.position.row },
-          { col: placedCard.position.col, row: placedCard.position.row + placedCard.size.rows }
-        ];
-        
-        // If both cards are large, add staggered positions for horizontal adjacency
+        // If both cards are large, ONLY allow staggered horizontal positions (exclusive rule)
         if (isLargeCard && isPlacedCardLarge) {
-          // For horizontal adjacency, add staggered positions
+          // For large cards, ONLY generate staggered horizontal positions
           const placedCardTop = placedCard.position.row;
           const placedCardBottom = placedCard.position.row + placedCard.size.rows;
           
-          // Left side - staggered positions
-          baseCandidates.push(
+          // Left side - ONLY staggered positions (center aligns with edge)
+          candidates.push(
             { col: placedCard.position.col - card.size.cols, row: placedCardTop - Math.floor(card.size.rows / 2) },
             { col: placedCard.position.col - card.size.cols, row: placedCardBottom - Math.floor(card.size.rows / 2) }
           );
           
-          // Right side - staggered positions
-          baseCandidates.push(
+          // Right side - ONLY staggered positions (center aligns with edge)
+          candidates.push(
             { col: placedCard.position.col + placedCard.size.cols, row: placedCardTop - Math.floor(card.size.rows / 2) },
             { col: placedCard.position.col + placedCard.size.cols, row: placedCardBottom - Math.floor(card.size.rows / 2) }
           );
+          // Do NOT add parallel positions for large cards
+        } else {
+          // For non-large cards or mixed pairs, allow all adjacent positions
+          candidates.push(
+            { col: placedCard.position.col - card.size.cols, row: placedCard.position.row },
+            { col: placedCard.position.col, row: placedCard.position.row - card.size.rows },
+            { col: placedCard.position.col + placedCard.size.cols, row: placedCard.position.row },
+            { col: placedCard.position.col, row: placedCard.position.row + placedCard.size.rows }
+          );
         }
-        
-        candidates.push(...baseCandidates);
       }
       
       // Score all valid candidate positions
       for (const candidate of candidates) {
         if (isValidPosition(candidate, card.size, placedCards)) {
-          const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
-          // Add small random factor (0-5%) to break ties and create variation
-          const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
-          const adjustedScore = score * randomFactor;
-          if (adjustedScore > bestScore) {
-            bestScore = adjustedScore;
-            bestPosition = candidate;
+          // For large cards, check if this position would create parallel alignment with other large cards
+          let isValidForLargeCard = true;
+          if (isLargeCard) {
+            for (const placedCard of placedCards) {
+              const placedCardArea = placedCard.size.cols * placedCard.size.rows;
+              const isPlacedCardLarge = placedCardArea >= LARGE_CARD_THRESHOLD_PLACE;
+              
+              if (isPlacedCardLarge) {
+                // Check if horizontally adjacent
+                const candidateEndCol = candidate.col + card.size.cols;
+                const placedEndCol = placedCard.position.col + placedCard.size.cols;
+                const horizontallyAdjacent = 
+                  (candidateEndCol === placedCard.position.col || placedEndCol === candidate.col) &&
+                  (candidate.row < placedCard.position.row + placedCard.size.rows &&
+                   candidate.row + card.size.rows > placedCard.position.row);
+                
+                if (horizontallyAdjacent) {
+                  // Check if parallel (not staggered)
+                  const candidateCenterRow = candidate.row + card.size.rows / 2;
+                  const placedCenterRow = placedCard.position.row + placedCard.size.rows / 2;
+                  const candidateTop = candidate.row;
+                  const candidateBottom = candidate.row + card.size.rows;
+                  const placedTop = placedCard.position.row;
+                  const placedBottom = placedCard.position.row + placedCard.size.rows;
+                  
+                  const isStaggered = 
+                    Math.abs(candidateCenterRow - placedTop) < 0.5 ||
+                    Math.abs(candidateCenterRow - placedBottom) < 0.5 ||
+                    Math.abs(placedCenterRow - candidateTop) < 0.5 ||
+                    Math.abs(placedCenterRow - candidateBottom) < 0.5;
+                  
+                  const isParallel = Math.abs(candidateCenterRow - placedCenterRow) < 1 ||
+                    (Math.abs(candidateTop - placedTop) < 1 && Math.abs(candidateBottom - placedBottom) < 1);
+                  
+                  // Reject parallel alignment - only allow staggered
+                  if (isParallel && !isStaggered) {
+                    isValidForLargeCard = false;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+          
+          if (isValidForLargeCard) {
+            const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
+            // Add small random factor (0-5%) to break ties and create variation
+            const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
+            const adjustedScore = score * randomFactor;
+            if (adjustedScore > bestScore) {
+              bestScore = adjustedScore;
+              bestPosition = candidate;
+            }
           }
         }
       }
@@ -327,23 +372,83 @@ function PublicationsGallery() {
       // If no adjacent position found, search nearby positions
       if (!bestPosition) {
         for (const placedCard of placedCards) {
+          const placedCardArea = placedCard.size.cols * placedCard.size.rows;
+          const isPlacedCardLarge = placedCardArea >= LARGE_CARD_THRESHOLD_PLACE;
+          
           for (let offset = 1; offset <= 3; offset++) {
-            const nearbyCandidates = [
-              { col: placedCard.position.col - card.size.cols - offset, row: placedCard.position.row },
-              { col: placedCard.position.col, row: placedCard.position.row - card.size.rows - offset },
-              { col: placedCard.position.col + placedCard.size.cols + offset, row: placedCard.position.row },
-              { col: placedCard.position.col, row: placedCard.position.row + placedCard.size.rows + offset }
-            ];
+            let nearbyCandidates = [];
+            
+            // If both are large, only consider staggered horizontal positions
+            if (isLargeCard && isPlacedCardLarge) {
+              const placedTop = placedCard.position.row;
+              const placedBottom = placedCard.position.row + placedCard.size.rows;
+              nearbyCandidates = [
+                { col: placedCard.position.col - card.size.cols - offset, row: placedTop - Math.floor(card.size.rows / 2) },
+                { col: placedCard.position.col - card.size.cols - offset, row: placedBottom - Math.floor(card.size.rows / 2) },
+                { col: placedCard.position.col + placedCard.size.cols + offset, row: placedTop - Math.floor(card.size.rows / 2) },
+                { col: placedCard.position.col + placedCard.size.cols + offset, row: placedBottom - Math.floor(card.size.rows / 2) }
+              ];
+            } else {
+              nearbyCandidates = [
+                { col: placedCard.position.col - card.size.cols - offset, row: placedCard.position.row },
+                { col: placedCard.position.col, row: placedCard.position.row - card.size.rows - offset },
+                { col: placedCard.position.col + placedCard.size.cols + offset, row: placedCard.position.row },
+                { col: placedCard.position.col, row: placedCard.position.row + placedCard.size.rows + offset }
+              ];
+            }
             
             for (const candidate of nearbyCandidates) {
               if (isValidPosition(candidate, card.size, placedCards)) {
-                const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
-                // Add small random factor to break ties
-                const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
-                const adjustedScore = score * randomFactor;
-                if (adjustedScore > bestScore) {
-                  bestScore = adjustedScore;
-                  bestPosition = candidate;
+                // Validate staggered alignment for large cards
+                let isValidForLargeCard = true;
+                if (isLargeCard) {
+                  for (const checkCard of placedCards) {
+                    const checkCardArea = checkCard.size.cols * checkCard.size.rows;
+                    const isCheckCardLarge = checkCardArea >= LARGE_CARD_THRESHOLD_PLACE;
+                    
+                    if (isCheckCardLarge) {
+                      const candidateEndCol = candidate.col + card.size.cols;
+                      const checkEndCol = checkCard.position.col + checkCard.size.cols;
+                      const horizontallyAdjacent = 
+                        (candidateEndCol === checkCard.position.col || checkEndCol === candidate.col) &&
+                        (candidate.row < checkCard.position.row + checkCard.size.rows &&
+                         candidate.row + card.size.rows > checkCard.position.row);
+                      
+                      if (horizontallyAdjacent) {
+                        const candidateCenterRow = candidate.row + card.size.rows / 2;
+                        const checkCenterRow = checkCard.position.row + checkCard.size.rows / 2;
+                        const candidateTop = candidate.row;
+                        const candidateBottom = candidate.row + card.size.rows;
+                        const checkTop = checkCard.position.row;
+                        const checkBottom = checkCard.position.row + checkCard.size.rows;
+                        
+                        const isStaggered = 
+                          Math.abs(candidateCenterRow - checkTop) < 0.5 ||
+                          Math.abs(candidateCenterRow - checkBottom) < 0.5 ||
+                          Math.abs(checkCenterRow - candidateTop) < 0.5 ||
+                          Math.abs(checkCenterRow - candidateBottom) < 0.5;
+                        
+                        const isParallel = Math.abs(candidateCenterRow - checkCenterRow) < 1 ||
+                          (Math.abs(candidateTop - checkTop) < 1 && Math.abs(candidateBottom - checkBottom) < 1);
+                        
+                        if (isParallel && !isStaggered) {
+                          isValidForLargeCard = false;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+                
+                if (isValidForLargeCard) {
+                  const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
+                  // Add small random factor to break ties
+                  const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
+                  const adjustedScore = score * randomFactor;
+                  if (adjustedScore > bestScore) {
+                    bestScore = adjustedScore;
+                    bestPosition = candidate;
+                  }
                 }
               }
             }
@@ -357,13 +462,57 @@ function PublicationsGallery() {
           for (let col = 1; col <= GRID_COLS - card.size.cols + 1; col++) {
             const candidate = { col, row };
             if (isValidPosition(candidate, card.size, placedCards)) {
-              const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
-              // Add small random factor to break ties
-              const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
-              const adjustedScore = score * randomFactor;
-              if (adjustedScore > bestScore) {
-                bestScore = adjustedScore;
-                bestPosition = candidate;
+              // For large cards, validate staggered alignment with other large cards
+              let isValidForLargeCard = true;
+              if (isLargeCard) {
+                for (const checkCard of placedCards) {
+                  const checkCardArea = checkCard.size.cols * checkCard.size.rows;
+                  const isCheckCardLarge = checkCardArea >= LARGE_CARD_THRESHOLD_PLACE;
+                  
+                  if (isCheckCardLarge) {
+                    const candidateEndCol = candidate.col + card.size.cols;
+                    const checkEndCol = checkCard.position.col + checkCard.size.cols;
+                    const horizontallyAdjacent = 
+                      (candidateEndCol === checkCard.position.col || checkEndCol === candidate.col) &&
+                      (candidate.row < checkCard.position.row + checkCard.size.rows &&
+                       candidate.row + card.size.rows > checkCard.position.row);
+                    
+                    if (horizontallyAdjacent) {
+                      const candidateCenterRow = candidate.row + card.size.rows / 2;
+                      const checkCenterRow = checkCard.position.row + checkCard.size.rows / 2;
+                      const candidateTop = candidate.row;
+                      const candidateBottom = candidate.row + card.size.rows;
+                      const checkTop = checkCard.position.row;
+                      const checkBottom = checkCard.position.row + checkCard.size.rows;
+                      
+                      const isStaggered = 
+                        Math.abs(candidateCenterRow - checkTop) < 0.5 ||
+                        Math.abs(candidateCenterRow - checkBottom) < 0.5 ||
+                        Math.abs(checkCenterRow - candidateTop) < 0.5 ||
+                        Math.abs(checkCenterRow - candidateBottom) < 0.5;
+                      
+                      const isParallel = Math.abs(candidateCenterRow - checkCenterRow) < 1 ||
+                        (Math.abs(candidateTop - checkTop) < 1 && Math.abs(candidateBottom - checkBottom) < 1);
+                      
+                      // Reject parallel - only allow staggered
+                      if (isParallel && !isStaggered) {
+                        isValidForLargeCard = false;
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
+              
+              if (isValidForLargeCard) {
+                const score = scorePosition(candidate, card.size, placedCards, cardArea, centerOffset);
+                // Add small random factor to break ties
+                const randomFactor = 1 + (Math.random() - 0.5) * 0.1;
+                const adjustedScore = score * randomFactor;
+                if (adjustedScore > bestScore) {
+                  bestScore = adjustedScore;
+                  bestPosition = candidate;
+                }
               }
             }
           }
@@ -404,24 +553,79 @@ function PublicationsGallery() {
         let bestNewScore = currentScore;
         
         // Check adjacent positions to other cards
+        const isLargeCardOpt = cardArea >= 20;
         for (const otherCard of otherCards) {
-          const candidates = [
-            { col: otherCard.position.col - card.size.cols, row: otherCard.position.row },
-            { col: otherCard.position.col, row: otherCard.position.row - card.size.rows },
-            { col: otherCard.position.col + otherCard.size.cols, row: otherCard.position.row },
-            { col: otherCard.position.col, row: otherCard.position.row + otherCard.size.rows }
-          ];
+          const otherCardArea = otherCard.size.cols * otherCard.size.rows;
+          const isOtherCardLarge = otherCardArea >= 20;
+          
+          let candidates = [];
+          
+          // If both are large cards, ONLY consider staggered horizontal positions
+          if (isLargeCardOpt && isOtherCardLarge) {
+            const otherTop = otherCard.position.row;
+            const otherBottom = otherCard.position.row + otherCard.size.rows;
+            candidates = [
+              { col: otherCard.position.col - card.size.cols, row: otherTop - Math.floor(card.size.rows / 2) },
+              { col: otherCard.position.col - card.size.cols, row: otherBottom - Math.floor(card.size.rows / 2) },
+              { col: otherCard.position.col + otherCard.size.cols, row: otherTop - Math.floor(card.size.rows / 2) },
+              { col: otherCard.position.col + otherCard.size.cols, row: otherBottom - Math.floor(card.size.rows / 2) }
+            ];
+          } else {
+            // For non-large or mixed pairs, allow all adjacent positions
+            candidates = [
+              { col: otherCard.position.col - card.size.cols, row: otherCard.position.row },
+              { col: otherCard.position.col, row: otherCard.position.row - card.size.rows },
+              { col: otherCard.position.col + otherCard.size.cols, row: otherCard.position.row },
+              { col: otherCard.position.col, row: otherCard.position.row + otherCard.size.rows }
+            ];
+          }
           
           for (const candidate of candidates) {
             if (isValidPosition(candidate, card.size, otherCards)) {
-              const newScore = scorePosition(candidate, card.size, otherCards, cardArea, centerOffset);
-              // Add small random factor for variation
-              const randomFactor = 1 + (Math.random() - 0.5) * 0.05;
-              const adjustedScore = newScore * randomFactor;
-              if (adjustedScore > bestNewScore) {
-                bestNewScore = adjustedScore;
-                bestNewPosition = candidate;
-                improved = true;
+              // Additional validation: for large cards, ensure staggered alignment
+              let isValidForLargeCard = true;
+              if (isLargeCardOpt && isOtherCardLarge) {
+                const candidateEndCol = candidate.col + card.size.cols;
+                const otherEndCol = otherCard.position.col + otherCard.size.cols;
+                const horizontallyAdjacent = 
+                  (candidateEndCol === otherCard.position.col || otherEndCol === candidate.col) &&
+                  (candidate.row < otherCard.position.row + otherCard.size.rows &&
+                   candidate.row + card.size.rows > otherCard.position.row);
+                
+                if (horizontallyAdjacent) {
+                  const candidateCenterRow = candidate.row + card.size.rows / 2;
+                  const otherCenterRow = otherCard.position.row + otherCard.size.rows / 2;
+                  const candidateTop = candidate.row;
+                  const candidateBottom = candidate.row + card.size.rows;
+                  const otherTop = otherCard.position.row;
+                  const otherBottom = otherCard.position.row + otherCard.size.rows;
+                  
+                  const isStaggered = 
+                    Math.abs(candidateCenterRow - otherTop) < 0.5 ||
+                    Math.abs(candidateCenterRow - otherBottom) < 0.5 ||
+                    Math.abs(otherCenterRow - candidateTop) < 0.5 ||
+                    Math.abs(otherCenterRow - candidateBottom) < 0.5;
+                  
+                  const isParallel = Math.abs(candidateCenterRow - otherCenterRow) < 1 ||
+                    (Math.abs(candidateTop - otherTop) < 1 && Math.abs(candidateBottom - otherBottom) < 1);
+                  
+                  // Reject if parallel - only allow staggered
+                  if (isParallel && !isStaggered) {
+                    isValidForLargeCard = false;
+                  }
+                }
+              }
+              
+              if (isValidForLargeCard) {
+                const newScore = scorePosition(candidate, card.size, otherCards, cardArea, centerOffset);
+                // Add small random factor for variation
+                const randomFactor = 1 + (Math.random() - 0.5) * 0.05;
+                const adjustedScore = newScore * randomFactor;
+                if (adjustedScore > bestNewScore) {
+                  bestNewScore = adjustedScore;
+                  bestNewPosition = candidate;
+                  improved = true;
+                }
               }
             }
           }
@@ -437,7 +641,7 @@ function PublicationsGallery() {
       if (!improved) break;
     }
     
-    // Large card staggered alignment optimization: enforce horizontal staggered arrangement
+    // Large card staggered alignment optimization: enforce horizontal staggered arrangement (EXCLUSIVE)
     const LARGE_CARD_THRESHOLD_OPT = 20;
     const largeCards = placedCards
       .map((card, idx) => ({ card, idx, area: card.size.cols * card.size.rows }))
@@ -445,8 +649,8 @@ function PublicationsGallery() {
       .sort((a, b) => b.area - a.area);
     
     if (largeCards.length >= 2) {
-      // Try to fix staggered alignment for large cards
-      for (let attempt = 0; attempt < 3; attempt++) {
+      // Try to fix staggered alignment for large cards - be more aggressive
+      for (let attempt = 0; attempt < 5; attempt++) {
         let fixed = false;
         
         for (let i = 0; i < largeCards.length; i++) {

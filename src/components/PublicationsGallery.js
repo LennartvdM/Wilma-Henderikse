@@ -129,15 +129,21 @@ function PublicationsGallery() {
     let adjacencyBonus = 0;
     for (const placedCard of placedCards) {
       // Check if directly adjacent (no gap)
-      const isAdjacent = 
+      // Horizontal adjacency: touching horizontally AND rows overlap
+      const horizontallyAdjacent = 
         (position.col + size.cols === placedCard.position.col || 
          placedCard.position.col + placedCard.size.cols === position.col) &&
         (position.row < placedCard.position.row + placedCard.size.rows &&
-         position.row + size.rows > placedCard.position.row) ||
+         position.row + size.rows > placedCard.position.row);
+      
+      // Vertical adjacency: touching vertically AND cols overlap
+      const verticallyAdjacent = 
         (position.row + size.rows === placedCard.position.row ||
          placedCard.position.row + placedCard.size.rows === position.row) &&
         (position.col < placedCard.position.col + placedCard.size.cols &&
          position.col + size.cols > placedCard.position.col);
+      
+      const isAdjacent = horizontallyAdjacent || verticallyAdjacent;
       
       if (isAdjacent) {
         adjacencyBonus = 30;

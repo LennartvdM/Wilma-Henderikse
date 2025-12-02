@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useScrollAnimation } from '../utils/animations';
 import './PublicationsGallery.css';
 
@@ -52,17 +52,17 @@ function PublicationsGallery() {
   const GRID_ROWS = 20; // Enough rows for the layout
 
   // Helper function to check if two rectangles overlap
-  const doRectsOverlap = (rect1, rect2) => {
+  const doRectsOverlap = useCallback((rect1, rect2) => {
     return !(
       rect1.right <= rect2.left ||
       rect1.left >= rect2.right ||
       rect1.bottom <= rect2.top ||
       rect1.top >= rect2.bottom
     );
-  };
+  }, []);
 
   // Helper to check if a position is valid (no overlaps, within bounds)
-  const isValidPosition = (position, size, placedCards) => {
+  const isValidPosition = useCallback((position, size, placedCards) => {
     // Check bounds
     if (position.col < 1 || position.col + size.cols - 1 > GRID_COLS) return false;
     if (position.row < 1 || position.row + size.rows - 1 > GRID_ROWS) return false;
@@ -89,10 +89,10 @@ function PublicationsGallery() {
     }
 
     return true;
-  };
+  }, [GRID_COLS, GRID_ROWS, doRectsOverlap]);
 
   // Spiral placement algorithm: clockwise (left->top->right->bottom)
-  const placeCardsInSpiral = (cards) => {
+  const placeCardsInSpiral = useCallback((cards) => {
     const placedCards = [];
     
     if (cards.length === 0) return placedCards;
@@ -167,12 +167,12 @@ function PublicationsGallery() {
     }
 
     return placedCards;
-  };
+  }, [GRID_COLS, GRID_ROWS, isValidPosition]); // Dependencies: grid dimensions and validation function
 
   // Calculate card positions using spiral algorithm
   const cardPositions = useMemo(() => {
     return placeCardsInSpiral(publications);
-  }, []); // Only calculate once on mount
+  }, [placeCardsInSpiral, publications]);
 
   // Helper function to get card bounding box (in grid units, accounting for nudge)
   const getCardBounds = (position, size, nudgeX = 0, nudgeY = 0) => {

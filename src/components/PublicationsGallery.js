@@ -92,127 +92,217 @@ function PublicationsGallery() {
     return true;
   }, [GRID_COLS, GRID_ROWS, doRectsOverlap]);
 
-  // Iterative spiral placement: each card placed snugly against existing cards
-  const placeCardsInSpiral = useCallback((cards) => {
-    const placedCards = [];
+  // Calculate position score: higher = better (considers center preference, size, and clustering)
+  const scorePosition = useCallback((position, size, placedCards, cardArea) => {
+    const centerCol = GRID_COLS / 2;
+    const centerRow = GRID_ROWS / 2;
     
-    if (cards.length === 0) return placedCards;
-
-    // Start with first card at a random position within the grid
-    const startCol = Math.max(1, Math.floor(Math.random() * (GRID_COLS / 2)) + 1);
-    const startRow = Math.max(1, Math.floor(Math.random() * (GRID_ROWS / 2)) + 1);
+    // Card center position
+    const cardCenterCol = position.col + size.cols / 2;
+    const cardCenterRow = position.row + size.rows / 2;
     
-    placedCards.push({
-      ...cards[0],
-      position: { col: startCol, row: startRow }
-    });
-
-    // For each subsequent card, place it iteratively - snug against existing cards
-    for (let i = 1; i < cards.length; i++) {
-      const card = cards[i];
-      let placed = false;
-      
-      // Strategy: Try positions directly adjacent to ALL already-placed cards
-      // Priority: last placed card first, then others in order
-      // For each placed card, try positions directly adjacent (no gap) in clockwise order
-      
-      // First, try positions directly adjacent to the last placed card (most recent)
-      const lastCard = placedCards[placedCards.length - 1];
-      
-      // Generate positions directly adjacent (no gap) to the last card
-      // Clockwise: left, top, right, bottom
-      const adjacentPositions = [
-        // Left - directly adjacent, no gap
-        { col: lastCard.position.col - card.size.cols, row: lastCard.position.row },
-        // Top - directly adjacent, no gap
-        { col: lastCard.position.col, row: lastCard.position.row - card.size.rows },
-        // Right - directly adjacent, no gap
-        { col: lastCard.position.col + lastCard.size.cols, row: lastCard.position.row },
-        // Bottom - directly adjacent, no gap
-        { col: lastCard.position.col, row: lastCard.position.row + lastCard.size.rows }
-      ];
-      
-      // Try adjacent positions first (snug placement)
-      for (const testPos of adjacentPositions) {
-        if (isValidPosition(testPos, card.size, placedCards)) {
-          placedCards.push({
-            ...card,
-            position: testPos
-          });
-          placed = true;
-          break;
-        }
+    // Distance from grid center (weighted by card size - larger cards prefer center more)
+    const distFromCenter = Math.sqrt(
+      Math.pow(cardCenterCol - centerCol, 2) + 
+      Math.pow(cardCenterRow - centerRow, 2)
+    );
+    const centerScore = 100 / (1 + distFromCenter * (1 + cardArea / 10)); // Size-weighted center preference
+    
+    // Proximity to existing cards (clustering/density)
+    let proximityScore = 0;
+    if (placedCards.length > 0) {
+      let minDistance = Infinity;
+      for (const placedCard of placedCards) {
+        const placedCenterCol = placedCard.position.col + placedCard.size.cols / 2;
+        const placedCenterRow = placedCard.position.row + placedCard.size.rows / 2;
+        const distance = Math.sqrt(
+          Math.pow(cardCenterCol - placedCenterCol, 2) + 
+          Math.pow(cardCenterRow - placedCenterRow, 2)
+        );
+        minDistance = Math.min(minDistance, distance);
       }
+      // Closer to existing cards = better (but not too close to avoid overlaps)
+      proximityScore = minDistance < 10 ? 50 / (1 + minDistance) : 0;
+    }
+    
+    // Adjacency bonus (snug placement)
+    let adjacencyBonus = 0;
+    for (const placedCard of placedCards) {
+      // Check if directly adjacent (no gap)
+      const isAdjacent = 
+        (position.col + size.cols === placedCard.position.col || 
+         placedCard.position.col + placedCard.size.cols === position.col) &&
+        (position.row < placedCard.position.row + placedCard.size.rows &&
+         position.row + size.rows > placedCard.position.row) ||
+        (position.row + size.rows === placedCard.position.row ||
+         placedCard.position.row + placedCard.size.rows === position.row) &&
+        (position.col < placedCard.position.col + placedCard.size.cols &&
+         position.col + size.cols > placedCard.position.col);
       
-      // If not placed, try positions adjacent to all other placed cards
-      if (!placed) {
-        for (let cardIndex = placedCards.length - 2; cardIndex >= 0 && !placed; cardIndex--) {
-          const referenceCard = placedCards[cardIndex];
-          
-          const otherAdjacentPositions = [
-            { col: referenceCard.position.col - card.size.cols, row: referenceCard.position.row },
-            { col: referenceCard.position.col, row: referenceCard.position.row - card.size.rows },
-            { col: referenceCard.position.col + referenceCard.size.cols, row: referenceCard.position.row },
-            { col: referenceCard.position.col, row: referenceCard.position.row + referenceCard.size.rows }
-          ];
-          
-          for (const testPos of otherAdjacentPositions) {
-            if (isValidPosition(testPos, card.size, placedCards)) {
-              placedCards.push({
-                ...card,
-                position: testPos
-              });
-              placed = true;
-              break;
-            }
-          }
-        }
-      }
-      
-      // If still not placed, try positions with minimal gap (1 cell) from any placed card
-      if (!placed) {
-        for (let cardIndex = placedCards.length - 1; cardIndex >= 0 && !placed; cardIndex--) {
-          const referenceCard = placedCards[cardIndex];
-          
-          const nearPositions = [
-            { col: referenceCard.position.col - card.size.cols - 1, row: referenceCard.position.row },
-            { col: referenceCard.position.col, row: referenceCard.position.row - card.size.rows - 1 },
-            { col: referenceCard.position.col + referenceCard.size.cols + 1, row: referenceCard.position.row },
-            { col: referenceCard.position.col, row: referenceCard.position.row + referenceCard.size.rows + 1 }
-          ];
-          
-          for (const testPos of nearPositions) {
-            if (isValidPosition(testPos, card.size, placedCards)) {
-              placedCards.push({
-                ...card,
-                position: testPos
-              });
-              placed = true;
-              break;
-            }
-          }
-        }
-      }
-      
-      // Final fallback: exhaustive search
-      if (!placed) {
-        for (let row = 1; row <= GRID_ROWS - card.size.rows + 1 && !placed; row++) {
-          for (let col = 1; col <= GRID_COLS - card.size.cols + 1 && !placed; col++) {
-            const testPos = { col, row };
-            if (isValidPosition(testPos, card.size, placedCards)) {
-              placedCards.push({
-                ...card,
-                position: testPos
-              });
-              placed = true;
-            }
-          }
-        }
+      if (isAdjacent) {
+        adjacencyBonus = 30;
+        break;
       }
     }
+    
+    return centerScore + proximityScore + adjacencyBonus;
+  }, [GRID_COLS, GRID_ROWS]);
 
+  // Size-aware density-optimized placement with multi-pass optimization
+  const placeCardsInSpiral = useCallback((cards) => {
+    if (cards.length === 0) return [];
+    
+    // Sort cards by size (area) - largest first to prioritize center placement
+    const sortedCards = [...cards].sort((a, b) => {
+      const areaA = a.size.cols * a.size.rows;
+      const areaB = b.size.cols * b.size.rows;
+      return areaB - areaA; // Largest first
+    });
+    
+    let placedCards = [];
+    
+    // Place first (largest) card near center
+    const centerCol = Math.floor(GRID_COLS / 2);
+    const centerRow = Math.floor(GRID_ROWS / 2);
+    const firstCard = sortedCards[0];
+    const startCol = Math.max(1, centerCol - Math.floor(firstCard.size.cols / 2));
+    const startRow = Math.max(1, centerRow - Math.floor(firstCard.size.rows / 2));
+    
+    placedCards.push({
+      ...firstCard,
+      position: { col: startCol, row: startRow }
+    });
+    
+    // Place remaining cards with scoring system
+    for (let i = 1; i < sortedCards.length; i++) {
+      const card = sortedCards[i];
+      const cardArea = card.size.cols * card.size.rows;
+      let bestPosition = null;
+      let bestScore = -Infinity;
+      
+      // Collect all candidate positions: adjacent to all placed cards
+      const candidates = [];
+      
+      for (const placedCard of placedCards) {
+        // Directly adjacent positions (no gap)
+        candidates.push(
+          { col: placedCard.position.col - card.size.cols, row: placedCard.position.row },
+          { col: placedCard.position.col, row: placedCard.position.row - card.size.rows },
+          { col: placedCard.position.col + placedCard.size.cols, row: placedCard.position.row },
+          { col: placedCard.position.col, row: placedCard.position.row + placedCard.size.rows }
+        );
+      }
+      
+      // Score all valid candidate positions
+      for (const candidate of candidates) {
+        if (isValidPosition(candidate, card.size, placedCards)) {
+          const score = scorePosition(candidate, card.size, placedCards, cardArea);
+          if (score > bestScore) {
+            bestScore = score;
+            bestPosition = candidate;
+          }
+        }
+      }
+      
+      // If no adjacent position found, search nearby positions
+      if (!bestPosition) {
+        for (const placedCard of placedCards) {
+          for (let offset = 1; offset <= 3; offset++) {
+            const nearbyCandidates = [
+              { col: placedCard.position.col - card.size.cols - offset, row: placedCard.position.row },
+              { col: placedCard.position.col, row: placedCard.position.row - card.size.rows - offset },
+              { col: placedCard.position.col + placedCard.size.cols + offset, row: placedCard.position.row },
+              { col: placedCard.position.col, row: placedCard.position.row + placedCard.size.rows + offset }
+            ];
+            
+            for (const candidate of nearbyCandidates) {
+              if (isValidPosition(candidate, card.size, placedCards)) {
+                const score = scorePosition(candidate, card.size, placedCards, cardArea);
+                if (score > bestScore) {
+                  bestScore = score;
+                  bestPosition = candidate;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Fallback: exhaustive search with scoring
+      if (!bestPosition) {
+        for (let row = 1; row <= GRID_ROWS - card.size.rows + 1; row++) {
+          for (let col = 1; col <= GRID_COLS - card.size.cols + 1; col++) {
+            const candidate = { col, row };
+            if (isValidPosition(candidate, card.size, placedCards)) {
+              const score = scorePosition(candidate, card.size, placedCards, cardArea);
+              if (score > bestScore) {
+                bestScore = score;
+                bestPosition = candidate;
+              }
+            }
+          }
+        }
+      }
+      
+      if (bestPosition) {
+        placedCards.push({
+          ...card,
+          position: bestPosition
+        });
+      }
+    }
+    
+    // Multi-pass optimization: try to improve density by repositioning cards
+    const MAX_OPTIMIZATION_PASSES = 2;
+    for (let pass = 0; pass < MAX_OPTIMIZATION_PASSES; pass++) {
+      let improved = false;
+      
+      // Try repositioning each card (except the first/largest)
+      for (let i = 1; i < placedCards.length; i++) {
+        const card = placedCards[i];
+        const cardArea = card.size.cols * card.size.rows;
+        const currentScore = scorePosition(card.position, card.size, placedCards.filter((_, idx) => idx !== i), cardArea);
+        
+        // Temporarily remove this card
+        const otherCards = placedCards.filter((_, idx) => idx !== i);
+        
+        // Find better position
+        let bestNewPosition = card.position;
+        let bestNewScore = currentScore;
+        
+        // Check adjacent positions to other cards
+        for (const otherCard of otherCards) {
+          const candidates = [
+            { col: otherCard.position.col - card.size.cols, row: otherCard.position.row },
+            { col: otherCard.position.col, row: otherCard.position.row - card.size.rows },
+            { col: otherCard.position.col + otherCard.size.cols, row: otherCard.position.row },
+            { col: otherCard.position.col, row: otherCard.position.row + otherCard.size.rows }
+          ];
+          
+          for (const candidate of candidates) {
+            if (isValidPosition(candidate, card.size, otherCards)) {
+              const newScore = scorePosition(candidate, card.size, otherCards, cardArea);
+              if (newScore > bestNewScore) {
+                bestNewScore = newScore;
+                bestNewPosition = candidate;
+                improved = true;
+              }
+            }
+          }
+        }
+        
+        // Update position if better
+        if (bestNewPosition !== card.position) {
+          placedCards[i].position = bestNewPosition;
+        }
+      }
+      
+      // If no improvements, stop early
+      if (!improved) break;
+    }
+    
     return placedCards;
-  }, [GRID_COLS, GRID_ROWS, isValidPosition]); // Dependencies: grid dimensions and validation function
+  }, [GRID_COLS, GRID_ROWS, isValidPosition, scorePosition]); // Dependencies: grid dimensions and validation function
 
   // Shuffle array function (Fisher-Yates algorithm)
   const shuffleArray = useCallback((array) => {

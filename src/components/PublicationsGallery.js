@@ -307,6 +307,69 @@ function PublicationsGallery() {
       if (!improved) break;
     }
     
+    // Center-pull optimization: magnetically pull cards toward center if space exists
+    const centerCol = GRID_COLS / 2;
+    const centerRow = GRID_ROWS / 2;
+    const MAX_CENTER_PULL_PASSES = 3;
+    
+    for (let pass = 0; pass < MAX_CENTER_PULL_PASSES; pass++) {
+      let moved = false;
+      
+      // Try to move each card closer to center
+      for (let i = 0; i < placedCards.length; i++) {
+        const card = placedCards[i];
+        const cardArea = card.size.cols * card.size.rows;
+        const currentCenterCol = card.position.col + card.size.cols / 2;
+        const currentCenterRow = card.position.row + card.size.rows / 2;
+        
+        // Calculate direction to center
+        const deltaCol = centerCol - currentCenterCol;
+        const deltaRow = centerRow - currentCenterRow;
+        
+        // Try moving one step closer to center (in both directions if needed)
+        const stepCol = deltaCol > 0 ? 1 : deltaCol < 0 ? -1 : 0;
+        const stepRow = deltaRow > 0 ? 1 : deltaRow < 0 ? -1 : 0;
+        
+        // Try moving horizontally first (if needed)
+        if (stepCol !== 0) {
+          const newPosCol = { col: card.position.col + stepCol, row: card.position.row };
+          const otherCards = placedCards.filter((_, idx) => idx !== i);
+          
+          if (isValidPosition(newPosCol, card.size, otherCards)) {
+            const currentScore = scorePosition(card.position, card.size, otherCards, cardArea);
+            const newScore = scorePosition(newPosCol, card.size, otherCards, cardArea);
+            
+            // Move if it improves or maintains score (center pull is beneficial)
+            if (newScore >= currentScore * 0.9) { // Allow slight score decrease for center benefit
+              placedCards[i].position = newPosCol;
+              moved = true;
+              continue;
+            }
+          }
+        }
+        
+        // Try moving vertically (if needed and horizontal didn't work)
+        if (stepRow !== 0) {
+          const newPosRow = { col: card.position.col, row: card.position.row + stepRow };
+          const otherCards = placedCards.filter((_, idx) => idx !== i);
+          
+          if (isValidPosition(newPosRow, card.size, otherCards)) {
+            const currentScore = scorePosition(card.position, card.size, otherCards, cardArea);
+            const newScore = scorePosition(newPosRow, card.size, otherCards, cardArea);
+            
+            // Move if it improves or maintains score
+            if (newScore >= currentScore * 0.9) {
+              placedCards[i].position = newPosRow;
+              moved = true;
+            }
+          }
+        }
+      }
+      
+      // If no cards moved, stop early
+      if (!moved) break;
+    }
+    
     return placedCards;
   }, [GRID_COLS, GRID_ROWS, isValidPosition, scorePosition]); // Dependencies: grid dimensions and validation function
 

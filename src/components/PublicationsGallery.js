@@ -120,7 +120,9 @@ function PublicationsGallery() {
                 gridRow: `${position.position.row} / span ${position.size.rows}`,
                 ...(transformValue && { transform: transformValue }),
                 transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                zIndex: isHovered ? 10 : 'auto'
+                zIndex: isHovered ? 10 : 'auto',
+                opacity: 1,
+                visibility: 'visible'
               }}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}

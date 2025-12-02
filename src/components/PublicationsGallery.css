@@ -16,6 +16,7 @@
   margin: 0 auto;
   padding: 20px;
   overflow: visible;
+  contain: none;
 }
 
 .publications-gallery-column-left {
@@ -48,11 +49,13 @@
   border-radius: 20px;
   background: var(--white);
   box-shadow: var(--shadow-md);
-  transition: all var(--transition-base);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow var(--transition-base);
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 120px;
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .publication-image::before {
@@ -124,6 +127,26 @@
 .publication-image.is-hovered {
   box-shadow: var(--shadow-lg);
   z-index: 10;
+  opacity: 1 !important;
+  visibility: visible !important;
+  will-change: transform;
+}
+
+/* Ensure publication images are always visible when animated, and stay visible on hover */
+.publication-image[data-animation].et-animated {
+  opacity: 1 !important;
+}
+
+.publication-image[data-animation].is-hovered {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Override animation CSS transforms that might conflict with hover */
+.publication-image[data-animation].is-hovered.et-animation-fade,
+.publication-image[data-animation].is-hovered.et-animation-slide,
+.publication-image[data-animation].is-hovered.et-animation-zoom {
+  animation: none !important;
 }
 
 .publication-image.is-hovered::before {

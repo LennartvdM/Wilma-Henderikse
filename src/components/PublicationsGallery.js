@@ -92,14 +92,13 @@ function PublicationsGallery() {
     return true;
   }, [GRID_COLS, GRID_ROWS, doRectsOverlap]);
 
-  // Spiral placement algorithm: clockwise (left->top->right->bottom)
+  // Iterative spiral placement: each card placed snugly against existing cards
   const placeCardsInSpiral = useCallback((cards) => {
     const placedCards = [];
     
     if (cards.length === 0) return placedCards;
 
     // Start with first card at a random position within the grid
-    // Randomize starting position for variety
     const startCol = Math.max(1, Math.floor(Math.random() * (GRID_COLS / 2)) + 1);
     const startRow = Math.max(1, Math.floor(Math.random() * (GRID_ROWS / 2)) + 1);
     
@@ -108,50 +107,94 @@ function PublicationsGallery() {
       position: { col: startCol, row: startRow }
     });
 
-    // For each subsequent card, try placing it in a spiral pattern around the last placed card
+    // For each subsequent card, place it iteratively - snug against existing cards
     for (let i = 1; i < cards.length; i++) {
       const card = cards[i];
-      const lastCard = placedCards[placedCards.length - 1];
-      
-      // Spiral pattern: try positions in clockwise order (left, top, right, bottom)
-      // at increasing distances
       let placed = false;
       
-      for (let radius = 1; radius <= Math.max(GRID_COLS, GRID_ROWS) && !placed; radius++) {
-        // Try positions in clockwise spiral: left, top, right, bottom
-        const spiralPositions = [
-          // Left side
-          { col: lastCard.position.col - card.size.cols - radius, row: lastCard.position.row },
-          { col: lastCard.position.col - card.size.cols - radius, row: lastCard.position.row - radius },
-          { col: lastCard.position.col - card.size.cols - radius, row: lastCard.position.row + radius },
-          // Top side
-          { col: lastCard.position.col, row: lastCard.position.row - card.size.rows - radius },
-          { col: lastCard.position.col - radius, row: lastCard.position.row - card.size.rows - radius },
-          { col: lastCard.position.col + radius, row: lastCard.position.row - card.size.rows - radius },
-          // Right side
-          { col: lastCard.position.col + lastCard.size.cols + radius, row: lastCard.position.row },
-          { col: lastCard.position.col + lastCard.size.cols + radius, row: lastCard.position.row - radius },
-          { col: lastCard.position.col + lastCard.size.cols + radius, row: lastCard.position.row + radius },
-          // Bottom side
-          { col: lastCard.position.col, row: lastCard.position.row + lastCard.size.rows + radius },
-          { col: lastCard.position.col - radius, row: lastCard.position.row + lastCard.size.rows + radius },
-          { col: lastCard.position.col + radius, row: lastCard.position.row + lastCard.size.rows + radius }
-        ];
-        
-        // Try each position in the spiral
-        for (const testPos of spiralPositions) {
-          if (isValidPosition(testPos, card.size, placedCards)) {
-            placedCards.push({
-              ...card,
-              position: testPos
-            });
-            placed = true;
-            break;
+      // Strategy: Try positions directly adjacent to ALL already-placed cards
+      // Priority: last placed card first, then others in order
+      // For each placed card, try positions directly adjacent (no gap) in clockwise order
+      
+      // First, try positions directly adjacent to the last placed card (most recent)
+      const lastCard = placedCards[placedCards.length - 1];
+      
+      // Generate positions directly adjacent (no gap) to the last card
+      // Clockwise: left, top, right, bottom
+      const adjacentPositions = [
+        // Left - directly adjacent, no gap
+        { col: lastCard.position.col - card.size.cols, row: lastCard.position.row },
+        // Top - directly adjacent, no gap
+        { col: lastCard.position.col, row: lastCard.position.row - card.size.rows },
+        // Right - directly adjacent, no gap
+        { col: lastCard.position.col + lastCard.size.cols, row: lastCard.position.row },
+        // Bottom - directly adjacent, no gap
+        { col: lastCard.position.col, row: lastCard.position.row + lastCard.size.rows }
+      ];
+      
+      // Try adjacent positions first (snug placement)
+      for (const testPos of adjacentPositions) {
+        if (isValidPosition(testPos, card.size, placedCards)) {
+          placedCards.push({
+            ...card,
+            position: testPos
+          });
+          placed = true;
+          break;
+        }
+      }
+      
+      // If not placed, try positions adjacent to all other placed cards
+      if (!placed) {
+        for (let cardIndex = placedCards.length - 2; cardIndex >= 0 && !placed; cardIndex--) {
+          const referenceCard = placedCards[cardIndex];
+          
+          const otherAdjacentPositions = [
+            { col: referenceCard.position.col - card.size.cols, row: referenceCard.position.row },
+            { col: referenceCard.position.col, row: referenceCard.position.row - card.size.rows },
+            { col: referenceCard.position.col + referenceCard.size.cols, row: referenceCard.position.row },
+            { col: referenceCard.position.col, row: referenceCard.position.row + referenceCard.size.rows }
+          ];
+          
+          for (const testPos of otherAdjacentPositions) {
+            if (isValidPosition(testPos, card.size, placedCards)) {
+              placedCards.push({
+                ...card,
+                position: testPos
+              });
+              placed = true;
+              break;
+            }
           }
         }
       }
       
-      // Fallback: exhaustive search if spiral didn't work
+      // If still not placed, try positions with minimal gap (1 cell) from any placed card
+      if (!placed) {
+        for (let cardIndex = placedCards.length - 1; cardIndex >= 0 && !placed; cardIndex--) {
+          const referenceCard = placedCards[cardIndex];
+          
+          const nearPositions = [
+            { col: referenceCard.position.col - card.size.cols - 1, row: referenceCard.position.row },
+            { col: referenceCard.position.col, row: referenceCard.position.row - card.size.rows - 1 },
+            { col: referenceCard.position.col + referenceCard.size.cols + 1, row: referenceCard.position.row },
+            { col: referenceCard.position.col, row: referenceCard.position.row + referenceCard.size.rows + 1 }
+          ];
+          
+          for (const testPos of nearPositions) {
+            if (isValidPosition(testPos, card.size, placedCards)) {
+              placedCards.push({
+                ...card,
+                position: testPos
+              });
+              placed = true;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Final fallback: exhaustive search
       if (!placed) {
         for (let row = 1; row <= GRID_ROWS - card.size.rows + 1 && !placed; row++) {
           for (let col = 1; col <= GRID_COLS - card.size.cols + 1 && !placed; col++) {

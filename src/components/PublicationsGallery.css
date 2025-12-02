@@ -1,6 +1,6 @@
 .publications-gallery-section {
   background: linear-gradient(to bottom, var(--white) 0%, var(--light-gray) 100%);
-  padding: var(--spacing-xl) var(--spacing-md);
+  padding: var(--spacing-xl) 6px;
   margin-top: 0;
   margin-bottom: 0;
   overflow: visible;
@@ -14,7 +14,7 @@
   gap: 6px;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0;
   overflow: visible;
   contain: none;
 }
@@ -245,7 +245,7 @@
   .publications-gallery-row {
     grid-template-columns: repeat(8, 1fr);
     gap: 8px;
-    padding: 15px;
+    padding: 0;
   }
   
   /* 8-column grid with scale differences */
@@ -282,13 +282,13 @@
 
 @media (max-width: 767px) {
   .publications-gallery-section {
-    padding: var(--spacing-lg) var(--spacing-sm);
+    padding: var(--spacing-lg) 6px;
   }
   
   .publications-gallery-row {
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    padding: 10px;
+    padding: 0;
   }
   
   /* Simple 4-column grid for mobile */

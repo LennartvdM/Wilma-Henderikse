@@ -2,41 +2,42 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { useScrollAnimation } from '../utils/animations';
 import './PublicationsGallery.css';
 
+// Publications array moved outside component to ensure stable reference
+const PUBLICATIONS = [
+  {
+    image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Scherven-Brengen-Geluk-2.png`,
+    pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/scherven-brengen-geluk.pdf`,
+    size: { cols: 6, rows: 6 } // HUGE
+  },
+  {
+    image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Sleutels_tot_succes_VDH-1.png`,
+    pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/sleutels_tot_succes_vdh.pdf`,
+    size: { cols: 3, rows: 3 } // Medium
+  },
+  {
+    image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Rijkmetleeftijd-2.png`,
+    pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/rijk-met-leeftijd-aan-de-slag-met-leeftijdsbewust-beleid-bij-de-rijksoverheid.pdf`,
+    size: { cols: 2, rows: 2 } // TINY
+  },
+  {
+    image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Bedrijven-Monitor.png`,
+    pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/bedrijvenmonitor-topvrouwen-2017.pdf`,
+    size: { cols: 2, rows: 2 } // TINY
+  },
+  {
+    image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Gelijke-Kansen-kaft.png`,
+    pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/werken-aan-gelijke-kansen-en-non-discriminatie.pdf`,
+    size: { cols: 6, rows: 6 } // HUGE
+  },
+  {
+    image: `${process.env.PUBLIC_URL}/wp-content/uploads/2021/11/Screenshot-2021-11-16-183809.png`,
+    pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/werkende-vaders-strategieën-voor-vaders-die-werk-en-zorg-willen-combineren.pdf`,
+    size: { cols: 2, rows: 3 } // Small
+  }
+];
+
 function PublicationsGallery() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  
-  const publications = [
-    {
-      image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Scherven-Brengen-Geluk-2.png`,
-      pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/scherven-brengen-geluk.pdf`,
-      size: { cols: 6, rows: 6 } // HUGE
-    },
-    {
-      image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Sleutels_tot_succes_VDH-1.png`,
-      pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/sleutels_tot_succes_vdh.pdf`,
-      size: { cols: 3, rows: 3 } // Medium
-    },
-    {
-      image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Rijkmetleeftijd-2.png`,
-      pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/rijk-met-leeftijd-aan-de-slag-met-leeftijdsbewust-beleid-bij-de-rijksoverheid.pdf`,
-      size: { cols: 2, rows: 2 } // TINY
-    },
-    {
-      image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Bedrijven-Monitor.png`,
-      pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/bedrijvenmonitor-topvrouwen-2017.pdf`,
-      size: { cols: 2, rows: 2 } // TINY
-    },
-    {
-      image: `${process.env.PUBLIC_URL}/wp-content/uploads/2018/10/Gelijke-Kansen-kaft.png`,
-      pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/werken-aan-gelijke-kansen-en-non-discriminatie.pdf`,
-      size: { cols: 6, rows: 6 } // HUGE
-    },
-    {
-      image: `${process.env.PUBLIC_URL}/wp-content/uploads/2021/11/Screenshot-2021-11-16-183809.png`,
-      pdf: `${process.env.PUBLIC_URL}/wp-content/uploads/publications/werkende-vaders-strategieën-voor-vaders-die-werk-en-zorg-willen-combineren.pdf`,
-      size: { cols: 2, rows: 3 } // Small
-    }
-  ];
 
   const image0Ref = useScrollAnimation('fade', 'top', 0, '0');
   const image1Ref = useScrollAnimation('slide', 'bottom', 0, '0');
@@ -170,9 +171,10 @@ function PublicationsGallery() {
   }, [GRID_COLS, GRID_ROWS, isValidPosition]); // Dependencies: grid dimensions and validation function
 
   // Calculate card positions using spiral algorithm
+  // PUBLICATIONS is a stable constant, so we don't need to include it in deps
   const cardPositions = useMemo(() => {
-    return placeCardsInSpiral(publications);
-  }, [placeCardsInSpiral, publications]);
+    return placeCardsInSpiral(PUBLICATIONS);
+  }, [placeCardsInSpiral]);
 
   // Helper function to get card bounding box (in grid units, accounting for nudge)
   const getCardBounds = (position, size, nudgeX = 0, nudgeY = 0) => {

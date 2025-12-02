@@ -98,9 +98,10 @@ function PublicationsGallery() {
     
     if (cards.length === 0) return placedCards;
 
-    // Start with first card at center-left position
-    const startCol = Math.max(1, Math.floor(GRID_COLS / 4));
-    const startRow = Math.max(1, Math.floor(GRID_ROWS / 3));
+    // Start with first card at a random position within the grid
+    // Randomize starting position for variety
+    const startCol = Math.max(1, Math.floor(Math.random() * (GRID_COLS / 2)) + 1);
+    const startRow = Math.max(1, Math.floor(Math.random() * (GRID_ROWS / 2)) + 1);
     
     placedCards.push({
       ...cards[0],
@@ -170,11 +171,22 @@ function PublicationsGallery() {
     return placedCards;
   }, [GRID_COLS, GRID_ROWS, isValidPosition]); // Dependencies: grid dimensions and validation function
 
-  // Calculate card positions using spiral algorithm
+  // Shuffle array function (Fisher-Yates algorithm)
+  const shuffleArray = useCallback((array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, []);
+
+  // Calculate card positions using spiral algorithm with randomized order
   // PUBLICATIONS is a stable constant, so we don't need to include it in deps
   const cardPositions = useMemo(() => {
-    return placeCardsInSpiral(PUBLICATIONS);
-  }, [placeCardsInSpiral]);
+    const shuffledCards = shuffleArray(PUBLICATIONS);
+    return placeCardsInSpiral(shuffledCards);
+  }, [placeCardsInSpiral, shuffleArray]);
 
   // Helper function to get card bounding box (in grid units, accounting for nudge)
   const getCardBounds = (position, size, nudgeX = 0, nudgeY = 0) => {

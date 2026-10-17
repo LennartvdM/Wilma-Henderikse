@@ -1,113 +1,61 @@
-# Wilma Henderikse - React Website
+# wilmahenderikse.nl
 
-This is a React conversion of the original WordPress site for Wilma Henderikse. The site has been rebuilt to match the original design exactly while using modern React technologies.
+De website van Wilma Henderikse — onderzoeker, maatschappelijk ondernemer en auteur.
 
-## Features
+- **/** — homepage: introductie, uitgelichte Monitor 2025, thema's, recente publicaties, over Wilma, contact
+- **/publicaties** — alle publicaties met covers, zoeken en filteren op thema en soort
+- **/monitor/** — de interactieve scrolly *Talent naar de Top — Monitor 2025* (overgenomen van monitortalent.nl)
 
-- **Homepage** with hero section, quote, work section, publications gallery, about section, and contact form
-- **Publications page** with a comprehensive list of all publications
-- **Responsive design** that matches the original WordPress site
-- **Modern React architecture** with component-based structure
-- **React Router** for navigation
+React + Vite. Elke pagina wordt bij het bouwen vooraf gerenderd naar echte HTML
+(`scripts/prerender.mjs`), dus de inhoud staat er meteen, ook zonder JavaScript en
+voor zoekmachines; daarna neemt React het over.
 
-## Setup Instructions
+## Werken aan de site
 
-### Prerequisites
-
-- Node.js (version 14 or higher)
-- npm or yarn
-
-### Installation
-
-1. Install dependencies:
-```powershell
+```bash
 npm install
+npm run dev       # http://localhost:3000
+npm run build     # → build/ (wat er gepubliceerd wordt)
+npm run preview   # bekijk de build lokaal
 ```
 
-2. Start the development server:
-```powershell
-npm start
+| Wat | Waar |
+| --- | --- |
+| Teksten homepage | `src/pages/Home.jsx` |
+| Publicatielijst, thema's | `src/data/publications.js` |
+| Vormgeving (kleuren, letters, layout) | `src/styles.css` — tokens bovenaan |
+| Menu en footer | `src/components/Layout.jsx` |
+| Paginatitels/omschrijvingen | `src/routes.js` |
+| Foto's | `public/img/` |
+
+## Publicatie toevoegen
+
+1. Zet de PDF in `public/wp-content/uploads/publications/` (bestandsnaam zonder rare tekens).
+2. Voeg een regel toe aan `src/data/publications.js` (velden staan bovenin dat bestand uitgelegd).
+3. `npm run covers` — rendert de voorkant van de PDF naar `public/covers/` en legt het
+   aantal pagina's en de bestandsgrootte vast in `src/data/pdf-meta.json`.
+   Heeft de PDF geen echte kaft (alleen een kale titelpagina), dan tekent de site zelf een
+   typografische cover. Vereist `pdftoppm` (poppler) en Python met Pillow.
+4. Commit de PDF, de cover en `pdf-meta.json`.
+
+## De Monitor-scrolly bijwerken
+
+De scrolly wordt gebouwd in de repo van monitortalent.nl (`Vragenlijst-Executive-Search`,
+`factsheet-deck/`). Als die een nieuwe versie heeft:
+
+```bash
+# naast deze repo uitgecheckt:
+node scripts/sync-monitor.mjs --from ../Vragenlijst-Executive-Search          # versie uit deck.json
+node scripts/sync-monitor.mjs --from ../Vragenlijst-Executive-Search --rev c272
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+Dit kopieert de snapshot naar `public/monitor/` en past hem aan voor deze site (paden,
+een terug-link naar de homepage in plaats van de survey-link, canonical naar
+monitortalent.nl). De gesynchroniseerde versie staat in `public/monitor/VERSION`.
+Bewerk `public/monitor/` niet met de hand — wijzig de bron en synchroniseer opnieuw.
 
-### Building for Production
+## Hosting
 
-To create a production build:
-
-```powershell
-npm run build
-```
-
-To check if the build has all required files:
-
-```powershell
-npm run check-build
-```
-
-This creates an optimized production build in the `build` folder.
-
-## Project Structure
-
-```
-src/
-├── components/          # Reusable React components
-│   ├── Hero.js         # Hero section with name and title
-│   ├── Quote.js        # Quote section
-│   ├── Work.js         # Work section with publications link
-│   ├── PublicationsGallery.js  # Gallery of publication images
-│   ├── About.js        # About section
-│   └── Contact.js      # Contact form
-├── pages/              # Page components
-│   ├── Home.js         # Homepage
-│   └── Publicaties.js  # Publications page
-├── App.js              # Main app component with routing
-└── index.js            # Entry point
-
-public/
-└── index.html          # HTML template
-
-wp-content/             # Original WordPress assets (images, PDFs, fonts)
-```
-
-## Assets
-
-All assets are located in the `public/wp-content/uploads/` directory:
-
-- **Images**: `public/wp-content/uploads/2018/10/` and `public/wp-content/uploads/2021/11/`
-- **PDFs**: `public/wp-content/uploads/publications/` - **All publications are consolidated here**
-
-### Adding New Publications
-
-1. Drop your PDF file into `public/wp-content/uploads/publications/`
-2. Add the filename to the `pdfFilenames` array in `src/pages/Publicaties.js`
-3. The title will be automatically generated from the filename
-
-The site uses:
-- **Fonts**: Montserrat and Open Sans (loaded from Google Fonts)
-- **Images**: All images from the original site
-- **PDFs**: All publication PDFs in one consolidated folder
-
-## Styling
-
-The site uses CSS modules and maintains the original Divi theme styling. All colors, fonts, and layouts match the original WordPress site:
-
-- Primary color: `#fcd21d` (yellow)
-- Accent color: `#e09900` (orange)
-- Text colors: `#353740`, `#747d88`, `#3f3f3f`
-- Background: `#f7f7f7` (light gray)
-
-## Contact Form
-
-The contact form currently uses a mailto link to send emails. For production use, you would want to integrate with a backend service or email service provider.
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## License
-
-This project is a conversion of the original WordPress site for Wilma Henderikse.
+`netlify.toml` (publiceert `build/`, stuurt oude WordPress-PDF-links door) en
+`vercel.json` voor Vercel. De vorige versies van de site staan ter referentie in
+`archive/` (de WordPress-export en de eerdere React/CRA-versie).

@@ -148,7 +148,7 @@ function Quote() {
 
 function About() {
   return (
-    <section className="section section--grey" id="over" aria-labelledby="over-title">
+    <section className="section section--marsh" id="over" aria-labelledby="over-title">
       <div className="wrap">
         <SectionHead id="over-title" title="Over Wilma" />
         <div className="about">

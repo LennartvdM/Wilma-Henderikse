@@ -3,7 +3,8 @@
    weight contrast — condensed heavy display against thin condensed numbers and a
    normal-width text face — not from mixing serif and sans. Flat colour, hard edges,
    a visible grid. Colours are those of her original site: sunflower yellow for large
-   fields, amber as the accent, anthracite and slate instead of black, light grey bands.
+   fields, amber as the accent, anthracite and slate instead of black, light grey bands —
+   plus the cool salt-marsh green from the spoonbill photo, which sits well next to yellow.
 */
 
 :root {
@@ -17,7 +18,11 @@
   --yellow-soft: #fef3c4;
   --amber: #e09900;
   --amber-ink: #a86f00;
-  --slate-soft: #e3e7ec;
+  --marsh-deep: #4f6457;
+  --marsh: #6c8773;
+  --marsh-light: #c4d2c7;
+  --marsh-pale: #e7ede8;
+  --marsh-night: #3c4c42;
 
   --font: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
 
@@ -246,6 +251,10 @@ ol {
 
 .section--grey {
   background: var(--grey);
+}
+
+.section--marsh {
+  background: var(--marsh-pale);
 }
 
 .shead {
@@ -550,7 +559,8 @@ ol {
 
 /* ── featured: the monitor ── */
 .feature {
-  background: var(--grey);
+  background: var(--marsh-deep);
+  color: #fff;
   padding: clamp(80px, 10vw, 140px) 0;
 }
 
@@ -568,7 +578,7 @@ ol {
 .feature__label {
   font-size: 14px;
   font-weight: 650;
-  color: var(--amber-ink);
+  color: var(--yellow);
 }
 
 .feature__title {
@@ -583,24 +593,42 @@ ol {
 
 .feature__title span {
   display: block;
-  color: var(--amber);
+  color: var(--yellow);
 }
 
 .feature__body {
-  color: var(--ink-2);
+  color: #dbe4dd;
   max-width: 30em;
 }
 
 .feature__preview {
   grid-column: 7 / 13;
   display: block;
-  border: 1px solid var(--hair);
-  box-shadow: 0 20px 40px -30px rgba(53, 55, 64, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 24px 48px -30px rgba(20, 30, 24, 0.6);
   transition: border-color 0.2s;
 }
 
 .feature__preview:hover {
-  border-color: var(--amber);
+  border-color: var(--yellow);
+}
+
+.feature .btn--yellow:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+.feature .btn--line {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+.feature .btn--line span {
+  color: var(--yellow);
+}
+
+.feature .btn--line:hover {
+  border-color: var(--yellow);
 }
 
 .feature__preview img {
@@ -749,7 +777,7 @@ ol {
 }
 
 .cover--diversiteit {
-  background: var(--ink);
+  background: var(--marsh-deep);
   color: #fff;
 }
 
@@ -759,7 +787,7 @@ ol {
 }
 
 .cover--werkzorg {
-  background: var(--slate-soft);
+  background: var(--marsh-light);
   color: var(--ink);
 }
 
@@ -1024,8 +1052,8 @@ ol {
 
 /* ── footer ── */
 .site-footer {
-  background: var(--ink);
-  color: #c3c7cf;
+  background: var(--marsh-night);
+  color: #cbd6ce;
   font-size: 14px;
 }
 
@@ -1062,6 +1090,7 @@ ol {
 
 /* ── publicaties page ── */
 .page-head {
+  background: var(--marsh-pale);
   padding: clamp(28px, 4vw, 56px) 0 clamp(36px, 4vw, 56px);
 }
 
@@ -1163,11 +1192,6 @@ ol {
   gap: 6px;
 }
 
-.chips--types {
-  padding-left: 20px;
-  border-left: 1px solid var(--hair);
-}
-
 .chip {
   display: inline-flex;
   align-items: center;
@@ -1193,13 +1217,6 @@ ol {
   background: var(--yellow);
   border-color: var(--yellow);
   color: var(--ink);
-}
-
-@media (max-width: 1100px) {
-  .chips--types {
-    padding-left: 0;
-    border-left: 0;
-  }
 }
 
 @media (max-width: 760px) {

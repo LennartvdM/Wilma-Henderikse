@@ -4,7 +4,8 @@
    normal-width text face — not from mixing serif and sans. Flat colour, hard edges,
    a visible grid. Colours are those of her original site: sunflower yellow for large
    fields, amber as the accent, anthracite and slate instead of black, light grey bands —
-   plus the cool salt-marsh green from the spoonbill photo, which sits well next to yellow.
+   plus a deep, cool teal green (#08574f) — the salt marsh of the spoonbill photo,
+   saturated — which sits well next to the yellow.
 */
 
 :root {
@@ -18,11 +19,11 @@
   --yellow-soft: #fef3c4;
   --amber: #e09900;
   --amber-ink: #a86f00;
-  --marsh-deep: #4f6457;
-  --marsh: #6c8773;
-  --marsh-light: #c4d2c7;
-  --marsh-pale: #e7ede8;
-  --marsh-night: #3c4c42;
+  --marsh-deep: #08574f;
+  --marsh: #2f7f73;
+  --marsh-light: #b5d6ce;
+  --marsh-pale: #e2eeeb;
+  --marsh-night: #053f39;
 
   --font: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
 
@@ -597,7 +598,7 @@ ol {
 }
 
 .feature__body {
-  color: #dbe4dd;
+  color: #cfe5df;
   max-width: 30em;
 }
 
@@ -605,7 +606,7 @@ ol {
   grid-column: 7 / 13;
   display: block;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 24px 48px -30px rgba(20, 30, 24, 0.6);
+  box-shadow: 0 24px 48px -30px rgba(2, 30, 26, 0.7);
   transition: border-color 0.2s;
 }
 
@@ -1053,7 +1054,7 @@ ol {
 /* ── footer ── */
 .site-footer {
   background: var(--marsh-night);
-  color: #cbd6ce;
+  color: #bcd6cf;
   font-size: 14px;
 }
 

@@ -38,14 +38,3 @@ export const catalog = publications
     };
   })
   .sort((a, b) => b.year - a.year || a.order - b.order);
-
-export const stats = {
-  count: catalog.length,
-  first: Math.min(...catalog.map((p) => p.year)),
-  last: Math.max(...catalog.map((p) => p.year)),
-  monitors: catalog.filter((p) => p.type === 'Monitor').length,
-};
-
-export const countByTheme = Object.fromEntries(
-  Object.keys(THEMES).map((k) => [k, catalog.filter((p) => p.themes.includes(k)).length]),
-);

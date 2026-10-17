@@ -1,18 +1,17 @@
 import React, { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PubCard from '../components/PubCard';
-import { catalog, stats, THEMES, TYPES, countByTheme } from '../data/catalog';
+import { catalog, THEMES, TYPES } from '../data/catalog';
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const haystack = new Map(
   catalog.map((p) => [p.id, norm([p.title, p.subtitle, p.authors, p.type, p.year].filter(Boolean).join(' '))]),
 );
 
-function Chip({ active, onClick, children, count }) {
+function Chip({ active, onClick, children }) {
   return (
     <button type="button" className={`chip${active ? ' is-active' : ''}`} aria-pressed={active} onClick={onClick}>
       {children}
-      {count != null && <span className="chip__count">{count}</span>}
     </button>
   );
 }
@@ -26,7 +25,6 @@ export default function Publicaties() {
 
   const theme = hydrated && THEMES[params.get('thema')] ? params.get('thema') : '';
   const type = hydrated && TYPES.includes(params.get('type')) ? params.get('type') : '';
-  const year = hydrated && /^\d{4}$/.test(params.get('jaar') || '') ? Number(params.get('jaar')) : 0;
   const [query, setQuery] = useState('');
   // take ?q= from the URL once; afterwards the input is the source and writes to the URL
   useEffect(() => {
@@ -47,22 +45,17 @@ export default function Publicaties() {
       (p) =>
         (!theme || p.themes.includes(theme)) &&
         (!type || p.type === type) &&
-        (!year || p.year === year) &&
         terms.every((t) => haystack.get(p.id).includes(t)),
     );
-  }, [theme, type, year, deferredQuery]);
+  }, [theme, type, deferredQuery]);
 
-  const filtered = theme || type || year || deferredQuery;
+  const filtered = theme || type || deferredQuery;
 
   return (
     <div className="pubs-page">
       <header className="page-head">
         <div className="wrap page-head__grid">
           <h1 className="page-title">Publicaties</h1>
-          <p className="page-head__count" aria-hidden="true">
-            {stats.count}
-            <span>{stats.first}–{stats.last}</span>
-          </p>
           <p className="page-lede">
             Monitors, rapporten, artikelen en handreikingen over gender, diversiteit, leeftijd en de
             combinatie van werk en zorg. Alle documenten zijn als PDF te openen en te downloaden.
@@ -91,7 +84,7 @@ export default function Publicaties() {
           <div className="chips" role="group" aria-label="Thema">
             <Chip active={!theme} onClick={() => update('thema', '')}>Alle thema’s</Chip>
             {Object.entries(THEMES).map(([key, t]) => (
-              <Chip key={key} active={theme === key} count={countByTheme[key]} onClick={() => update('thema', theme === key ? '' : key)}>
+              <Chip key={key} active={theme === key} onClick={() => update('thema', theme === key ? '' : key)}>
                 {t.label}
               </Chip>
             ))}
@@ -102,18 +95,15 @@ export default function Publicaties() {
                 {t}
               </Chip>
             ))}
-            {year > 0 && (
-              <Chip active onClick={() => update('jaar', '')}>
-                {year} <span aria-hidden="true">×</span>
-              </Chip>
-            )}
           </div>
         </div>
       </div>
 
       <section className="wrap results" aria-live="polite">
         <p className="results__count">
-          {filtered ? `${results.length} van ${stats.count} publicaties` : `Alle ${stats.count} publicaties, nieuwste eerst`}
+          {filtered
+            ? `${results.length} ${results.length === 1 ? 'publicatie' : 'publicaties'} gevonden`
+            : 'Nieuwste eerst'}
           {filtered && (
             <button type="button" className="results__reset" onClick={() => { setQuery(''); setParams({}, { replace: true, preventScrollReset: true }); }}>
               Wis filters

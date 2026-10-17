@@ -85,7 +85,7 @@ function Header() {
             {NAV.map((item) => (
               <li key={item.label}>
                 {item.href ? (
-                  <a href={item.href} className="site-nav__link site-nav__link--feature">{item.label}</a>
+                  <a href={item.href} className="site-nav__link">{item.label}</a>
                 ) : item.route ? (
                   <NavLink to={item.to} className="site-nav__link">{item.label}</NavLink>
                 ) : (

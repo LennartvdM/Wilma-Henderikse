@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PubCard from '../components/PubCard';
-import Timeline from '../components/Timeline';
-import { catalog, stats, THEMES, countByTheme } from '../data/catalog';
+import { catalog, THEMES } from '../data/catalog';
 
 const REPORT_2024 = catalog.find((p) => p.file?.startsWith('wie-vooruit-wil'));
 // newest five with a real cover, one per title (the 2020 monitor and its factsheet share one)
@@ -50,18 +49,7 @@ function Hero() {
             werk — van vrouwen aan de top tot culturele diversiteit, leeftijd en de combinatie van
             werk en zorg.
           </p>
-          <div className="actions">
-            <a className="btn btn--yellow" href="/monitor/">
-              Bekijk de Monitor 2025 <span aria-hidden="true">→</span>
-            </a>
-            <Link className="btn btn--line" to="/publicaties">
-              Alle publicaties
-            </Link>
-          </div>
         </div>
-      </div>
-      <div className="wrap reveal">
-        <Timeline />
       </div>
     </section>
   );
@@ -105,10 +93,7 @@ function Work() {
     <section className="section" id="werk" aria-labelledby="werk-title">
       <div className="wrap">
         <SectionHead id="werk-title" title="Werk">
-          <p>
-            Onderzoek en advies over gelijke kansen op de werkvloer, in vijf thema’s. Het getal is
-            het aantal publicaties per thema.
-          </p>
+          <p>Onderzoek en advies over gelijke kansen op de werkvloer.</p>
         </SectionHead>
         <ol className="themes">
           {Object.entries(THEMES).map(([key, theme], i) => (
@@ -116,7 +101,7 @@ function Work() {
               <Link to={`/publicaties?thema=${key}`} className="theme">
                 <span className="theme__label">{theme.label}</span>
                 <span className="theme__blurb">{theme.blurb}</span>
-                <span className="theme__count">{countByTheme[key]}</span>
+                <span className="theme__more" aria-hidden="true">→</span>
               </Link>
             </li>
           ))}
@@ -132,7 +117,7 @@ function Recent() {
       <div className="wrap">
         <SectionHead id="recent-title" title="Recent">
           <Link className="arrow-link" to="/publicaties">
-            Alle {stats.count} publicaties <span aria-hidden="true">→</span>
+            Alle publicaties <span aria-hidden="true">→</span>
           </Link>
         </SectionHead>
         <div className="shelf">

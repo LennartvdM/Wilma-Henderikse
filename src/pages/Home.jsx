@@ -86,7 +86,7 @@ function MonitorFeature() {
               Open de monitor <span aria-hidden="true">→</span>
             </a>
             {REPORT_2024 && (
-              <a className="btn btn--line-light" href={REPORT_2024.href} target="_blank" rel="noopener noreferrer">
+              <a className="btn btn--line" href={REPORT_2024.href} target="_blank" rel="noopener noreferrer">
                 Rapport 2024 · PDF
               </a>
             )}
@@ -163,7 +163,7 @@ function Quote() {
 
 function About() {
   return (
-    <section className="section" id="over" aria-labelledby="over-title">
+    <section className="section section--grey" id="over" aria-labelledby="over-title">
       <div className="wrap">
         <SectionHead id="over-title" title="Over Wilma" />
         <div className="about">

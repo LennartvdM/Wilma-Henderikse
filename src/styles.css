@@ -2,19 +2,22 @@
    One sans family (Archivo, variable width + weight). Hierarchy comes from width and
    weight contrast — condensed heavy display against thin condensed numbers and a
    normal-width text face — not from mixing serif and sans. Flat colour, hard edges,
-   a visible grid; yellow/black/white from her original site. The recurring motif is
-   data: her publications per year, as bars. */
+   a visible grid. Colours are those of her original site: sunflower yellow for large
+   fields, amber as the accent, anthracite and slate instead of black, light grey bands.
+   The recurring motif is data: her publications per year, as bars. */
 
 :root {
   --bg: #ffffff;
-  --grey: #f0f0ec;
-  --ink: #111111;
-  --ink-2: #3b3b3b;
-  --muted: #6f6f6f;
-  --hair: #d8d8d2;
+  --grey: #f7f7f7;
+  --ink: #353740;
+  --ink-2: #555b66;
+  --muted: #747d88;
+  --hair: #dfe1e5;
   --yellow: #fcd21d;
-  --red: #e0442d;
-  --stone: #cfd3cf;
+  --yellow-soft: #fef3c4;
+  --amber: #e09900;
+  --amber-ink: #a86f00;
+  --slate-soft: #e3e7ec;
 
   --font: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
 
@@ -174,6 +177,10 @@ ol {
     border-color 0.2s;
 }
 
+.btn--line span {
+  color: var(--amber);
+}
+
 .btn span {
   transition: transform 0.25s var(--ease);
 }
@@ -189,14 +196,8 @@ ol {
 }
 
 .btn--yellow:hover {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--yellow);
-}
-
-.feature .btn--yellow:hover {
-  background: #fff;
-  border-color: #fff;
+  background: var(--amber);
+  border-color: var(--amber);
   color: var(--ink);
 }
 
@@ -205,18 +206,12 @@ ol {
   color: var(--ink);
 }
 
+.btn--line {
+  border-color: var(--hair);
+}
+
 .btn--line:hover {
-  background: var(--ink);
-  color: #fff;
-}
-
-.btn--line-light {
-  border-color: rgba(255, 255, 255, 0.45);
-  color: #fff;
-}
-
-.btn--line-light:hover {
-  border-color: #fff;
+  border-color: var(--amber);
 }
 
 .arrow-link {
@@ -232,8 +227,12 @@ ol {
   transition: background-color 0.2s;
 }
 
+.arrow-link span {
+  color: var(--amber);
+}
+
 .arrow-link:hover {
-  background: var(--yellow);
+  border-color: var(--amber);
 }
 
 .prose p + p {
@@ -256,7 +255,7 @@ ol {
   align-items: end;
   padding-top: 16px;
   margin-bottom: clamp(40px, 5vw, 72px);
-  border-top: 3px solid var(--ink);
+  border-top: 2px solid var(--ink);
 }
 
 .shead__title {
@@ -292,7 +291,7 @@ ol {
 
 .site-header.is-scrolled,
 .site-header.is-open {
-  box-shadow: 0 1px 0 var(--ink);
+  box-shadow: 0 1px 0 var(--hair);
 }
 
 .site-header__bar {
@@ -317,7 +316,7 @@ ol {
   width: 14px;
   height: 14px;
   background: var(--yellow);
-  box-shadow: inset 0 -5px 0 var(--ink);
+  box-shadow: inset 0 -5px 0 var(--amber);
 }
 
 .site-nav ul {
@@ -337,7 +336,7 @@ ol {
 
 .site-nav__link:hover,
 .site-nav__link.active {
-  box-shadow: inset 0 -2px 0 var(--ink);
+  box-shadow: inset 0 -2px 0 var(--amber);
 }
 
 .site-nav__link--feature {
@@ -348,8 +347,7 @@ ol {
 
 .site-nav__link--feature:hover {
   box-shadow: none;
-  background: var(--ink);
-  color: var(--yellow);
+  background: var(--amber);
 }
 
 .menu-toggle {
@@ -416,7 +414,7 @@ ol {
     right: 0;
     padding: 0 var(--gutter) 16px;
     background: var(--bg);
-    border-bottom: 3px solid var(--ink);
+    border-bottom: 2px solid var(--yellow);
     display: none;
   }
 
@@ -514,7 +512,7 @@ ol {
 
 .hero__roles li {
   padding-top: 10px;
-  border-top: 3px solid var(--ink);
+  border-top: 2px solid var(--yellow);
   font-size: 16px;
   font-weight: 650;
   line-height: 1.25;
@@ -530,7 +528,7 @@ ol {
   font-size: clamp(20px, 1.9vw, 26px);
   line-height: 1.35;
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: var(--ink-2);
   text-wrap: pretty;
 }
 
@@ -580,6 +578,7 @@ ol {
 }
 
 .timeline__total {
+  color: var(--amber-ink);
   font-size: clamp(40px, 4.4vw, 64px);
   font-stretch: 62%;
   font-weight: 200;
@@ -591,7 +590,7 @@ ol {
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   gap: clamp(2px, 0.5vw, 6px);
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--muted);
 }
 
 .timeline__bars li {
@@ -606,13 +605,13 @@ ol {
   position: relative;
   display: block;
   height: calc(var(--h) * 100%);
-  background: var(--ink);
+  background: var(--muted);
   transition: background-color 0.2s;
 }
 
 .timeline__bars a:hover,
 .timeline__bars a:focus-visible {
-  background: var(--yellow);
+  background: var(--amber);
   outline: none;
 }
 
@@ -658,8 +657,7 @@ ol {
 
 /* ── featured: the monitor ── */
 .feature {
-  background: var(--ink);
-  color: #fff;
+  background: var(--grey);
   padding: clamp(80px, 10vw, 140px) 0;
 }
 
@@ -677,7 +675,7 @@ ol {
 .feature__label {
   font-size: 14px;
   font-weight: 650;
-  color: var(--yellow);
+  color: var(--amber-ink);
 }
 
 .feature__title {
@@ -692,23 +690,24 @@ ol {
 
 .feature__title span {
   display: block;
-  color: var(--yellow);
+  color: var(--amber);
 }
 
 .feature__body {
-  color: #c9c9c9;
+  color: var(--ink-2);
   max-width: 30em;
 }
 
 .feature__preview {
   grid-column: 7 / 13;
   display: block;
-  border: 1px solid #3a3a3a;
+  border: 1px solid var(--hair);
+  box-shadow: 0 20px 40px -30px rgba(53, 55, 64, 0.45);
   transition: border-color 0.2s;
 }
 
 .feature__preview:hover {
-  border-color: var(--yellow);
+  border-color: var(--amber);
 }
 
 .feature__preview img {
@@ -730,7 +729,7 @@ ol {
 
 /* ── work: themes as a ruled index ── */
 .themes > li {
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--hair);
 }
 
 .theme {
@@ -746,7 +745,7 @@ ol {
 
 .theme:hover,
 .theme:focus-visible {
-  background: var(--yellow);
+  background: var(--yellow-soft);
   outline: none;
 }
 
@@ -765,6 +764,7 @@ ol {
 }
 
 .theme__count {
+  color: var(--amber);
   grid-column: 11 / 13;
   justify-self: end;
   font-size: clamp(48px, 5.4vw, 80px);
@@ -804,7 +804,7 @@ ol {
   aspect-ratio: 3 / 4;
   overflow: hidden;
   background: var(--grey);
-  outline: 1px solid rgba(17, 17, 17, 0.14);
+  outline: 1px solid rgba(53, 55, 64, 0.14);
   outline-offset: -1px;
   transition: transform 0.35s var(--ease);
 }
@@ -824,7 +824,6 @@ ol {
   padding: 9%;
   background: var(--ink);
   color: #fff;
-  outline: 0;
 }
 
 .cover__type {
@@ -861,20 +860,18 @@ ol {
 }
 
 .cover--leeftijd {
-  background: var(--red);
-  color: #fff;
+  background: var(--amber);
+  color: var(--ink);
 }
 
 .cover--werkzorg {
-  background: var(--stone);
+  background: var(--slate-soft);
   color: var(--ink);
 }
 
 .cover--beleid {
   background: #fff;
   color: var(--ink);
-  outline: 2px solid var(--ink);
-  outline-offset: -2px;
 }
 
 /* ── publication card ── */
@@ -894,8 +891,8 @@ ol {
 
 .pub__link:hover .pub__title,
 .pub__link:focus-visible .pub__title {
-  background: var(--yellow);
-  box-shadow: 0 0 0 2px var(--yellow);
+  background: var(--yellow-soft);
+  box-shadow: 0 0 0 2px var(--yellow-soft);
 }
 
 .pub__body {
@@ -953,8 +950,8 @@ ol {
   place-items: center;
   width: 20px;
   height: 20px;
-  background: var(--ink);
-  color: #fff;
+  background: var(--yellow);
+  color: var(--ink);
   font-size: 12px;
 }
 
@@ -993,7 +990,7 @@ ol {
 
 /* ── quote ── */
 .quote {
-  background: var(--yellow);
+  background: var(--bg);
   padding: clamp(72px, 9vw, 130px) 0;
 }
 
@@ -1004,6 +1001,7 @@ ol {
 }
 
 .quote__mark {
+  color: var(--yellow);
   grid-column: 1 / 3;
   grid-row: 1 / 3;
   font-size: clamp(140px, 17vw, 260px);
@@ -1030,6 +1028,7 @@ ol {
   margin-top: 28px;
   font-size: 16px;
   font-weight: 650;
+  color: var(--amber-ink);
 }
 
 @media (max-width: 760px) {
@@ -1097,8 +1096,8 @@ ol {
 
 /* ── contact ── */
 .contact {
-  background: var(--ink);
-  color: #fff;
+  background: var(--yellow);
+  color: var(--ink);
   padding: clamp(80px, 10vw, 140px) 0 clamp(64px, 8vw, 110px);
 }
 
@@ -1106,7 +1105,7 @@ ol {
   font-size: clamp(22px, 2.2vw, 30px);
   font-weight: 500;
   letter-spacing: -0.01em;
-  color: #c9c9c9;
+  color: var(--ink);
 }
 
 .contact__mail {
@@ -1119,20 +1118,21 @@ ol {
   letter-spacing: -0.008em;
   text-decoration: none;
   overflow-wrap: anywhere;
-  border-bottom: 0.06em solid var(--yellow);
-  transition: color 0.2s;
+  border-bottom: 0.05em solid var(--ink);
+  transition:
+    color 0.2s,
+    border-color 0.2s;
 }
 
 .contact__mail:hover {
-  color: var(--yellow);
+  border-color: var(--amber);
 }
 
 /* ── footer ── */
 .site-footer {
   background: var(--ink);
-  color: #a9a9a9;
+  color: #c3c7cf;
   font-size: 14px;
-  border-top: 1px solid #333;
 }
 
 .site-footer__inner {
@@ -1188,6 +1188,7 @@ ol {
 }
 
 .page-head__count {
+  color: var(--amber);
   grid-column: 9 / 13;
   justify-self: end;
   text-align: right;
@@ -1199,6 +1200,7 @@ ol {
 }
 
 .page-head__count span {
+  color: var(--muted);
   display: block;
   margin-top: 12px;
   font-size: 15px;
@@ -1234,8 +1236,8 @@ ol {
   top: var(--header-h);
   z-index: 20;
   background: var(--bg);
-  border-top: 3px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--hair);
 }
 
 .filters__inner {
@@ -1270,7 +1272,7 @@ ol {
   height: 40px;
   padding: 0 0 0 28px;
   border: 0;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 2px solid var(--hair);
   border-radius: 0;
   background: transparent;
   font: inherit;
@@ -1284,7 +1286,7 @@ ol {
 
 .search input:focus {
   outline: none;
-  background: linear-gradient(var(--yellow), var(--yellow)) 0 100% / 100% 40% no-repeat;
+  border-bottom-color: var(--amber);
 }
 
 .chips {
@@ -1304,7 +1306,7 @@ ol {
   gap: 8px;
   height: 36px;
   padding: 0 12px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--hair);
   border-radius: 0;
   background: transparent;
   font: 550 14px/1 var(--font);
@@ -1316,12 +1318,13 @@ ol {
 }
 
 .chip:hover {
-  background: var(--yellow);
+  border-color: var(--amber);
 }
 
 .chip.is-active {
-  background: var(--ink);
-  color: #fff;
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--ink);
 }
 
 .chip__count {
@@ -1379,7 +1382,7 @@ ol {
 
 .results__reset {
   border: 0;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 2px solid var(--yellow);
   background: none;
   padding: 0;
   font: 650 14px var(--font);
@@ -1388,7 +1391,7 @@ ol {
 }
 
 .results__reset:hover {
-  background: var(--yellow);
+  border-color: var(--amber);
 }
 
 .results__empty {

@@ -1,6 +1,13 @@
 // Publications data with dates, summaries, and tags
 export const publications = [
   {
+    title: 'Wie vooruit wil moet doortrappen, Monitor Talent naar de Top 2024',
+    date: '2025',
+    summary: 'Monitor onderzoek naar het aandeel vrouwen in de top van charterorganisaties en de inzet op M/V-diversiteitsbeleid en inclusie.',
+    tags: ['Diversiteit', 'Talent', 'Monitor'],
+    pdf: 'wie-vooruit-wil-moet-doortrappen-monitor-talent-naar-de-top-2024.pdf'
+  },
+  {
     title: 'Het verschil maken. Juist nu Monitor Talent naar de Top 2020',
     date: '2020',
     summary: 'Monitor onderzoek naar talentontwikkeling en diversiteit in de top van organisaties.',

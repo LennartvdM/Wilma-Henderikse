@@ -26,6 +26,7 @@ export default function Publicaties() {
 
   const theme = hydrated && THEMES[params.get('thema')] ? params.get('thema') : '';
   const type = hydrated && TYPES.includes(params.get('type')) ? params.get('type') : '';
+  const year = hydrated && /^\d{4}$/.test(params.get('jaar') || '') ? Number(params.get('jaar')) : 0;
   const [query, setQuery] = useState('');
   // take ?q= from the URL once; afterwards the input is the source and writes to the URL
   useEffect(() => {
@@ -46,20 +47,22 @@ export default function Publicaties() {
       (p) =>
         (!theme || p.themes.includes(theme)) &&
         (!type || p.type === type) &&
+        (!year || p.year === year) &&
         terms.every((t) => haystack.get(p.id).includes(t)),
     );
-  }, [theme, type, deferredQuery]);
+  }, [theme, type, year, deferredQuery]);
 
-  const filtered = theme || type || deferredQuery;
+  const filtered = theme || type || year || deferredQuery;
 
   return (
     <div className="pubs-page">
       <header className="page-head">
-        <div className="wrap">
-          <p className="eyebrow eyebrow--plain">Publicaties</p>
-          <h1 className="page-title">
-            {stats.count} publicaties, <em>{stats.first}–{stats.last}</em>
-          </h1>
+        <div className="wrap page-head__grid">
+          <h1 className="page-title">Publicaties</h1>
+          <p className="page-head__count" aria-hidden="true">
+            {stats.count}
+            <span>{stats.first}–{stats.last}</span>
+          </p>
           <p className="page-lede">
             Monitors, rapporten, artikelen en handreikingen over gender, diversiteit, leeftijd en de
             combinatie van werk en zorg. Alle documenten zijn als PDF te openen en te downloaden.
@@ -99,6 +102,11 @@ export default function Publicaties() {
                 {t}
               </Chip>
             ))}
+            {year > 0 && (
+              <Chip active onClick={() => update('jaar', '')}>
+                {year} <span aria-hidden="true">×</span>
+              </Chip>
+            )}
           </div>
         </div>
       </div>

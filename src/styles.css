@@ -913,7 +913,7 @@ ol {
 
 /* ── quote ── */
 .quote {
-  background: var(--bg);
+  background: var(--marsh-pale);
   padding: clamp(72px, 9vw, 130px) 0;
 }
 

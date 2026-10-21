@@ -11,10 +11,10 @@ export default function NotFound() {
           homepage.
         </p>
         <div className="actions">
-          <Link className="btn btn--yellow" to="/">
+          <Link className="btn btn--teal" to="/">
             Naar de homepage <span aria-hidden="true">→</span>
           </Link>
-          <Link className="btn btn--line" to="/publicaties">
+          <Link className="btn btn--quiet" to="/publicaties">
             Publicaties
           </Link>
         </div>

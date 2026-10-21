@@ -40,7 +40,7 @@ function Hero() {
           <h1 className="hero__name reveal">Wilma Henderikse</h1>
           <p className="hero__lede reveal">
             Vraagstukken van sociale gelijkheid en rechtvaardigheid vormen een rode draad in mijn
-            werk — van vrouwen aan de top tot culturele diversiteit, leeftijd en de combinatie van
+            werk: van vrouwen aan de top tot culturele diversiteit, leeftijd en de combinatie van
             werk en zorg.
           </p>
         </div>
@@ -162,7 +162,7 @@ function MonitorFeature() {
           </h2>
           <p className="feature__body">
             De voortgang van vrouwen en cultureel divers talent in topfuncties bij Nederlandse
-            organisaties — niet als rapport, maar als verhaal om doorheen te scrollen. Wilma
+            organisaties, niet als rapport maar als verhaal om doorheen te scrollen. Wilma
             Henderikse werkte mee aan de analyse en presentatie.
           </p>
           <div className="actions">

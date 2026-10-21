@@ -1,38 +1,23 @@
 {
   "name": "wilma-henderikse",
-  "version": "1.0.0",
-  "description": "React site for Wilma Henderikse",
+  "version": "2.0.0",
+  "description": "Website van Wilma Henderikse",
   "private": true,
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0",
-    "react-scripts": "5.0.1"
-  },
+  "type": "module",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "test-routing": "node scripts/test-routing.js",
-    "check-build": "powershell -ExecutionPolicy Bypass -File scripts/check-build.ps1"
+    "dev": "vite",
+    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir .ssr && node scripts/prerender.mjs",
+    "preview": "vite preview --port 4173",
+    "covers": "python3 scripts/make-covers.py",
+    "sync-monitor": "node scripts/sync-monitor.mjs"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "vite": "^7.3.1"
   }
 }
-

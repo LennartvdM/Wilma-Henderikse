@@ -1,12 +1,44 @@
 [build]
-  publish = "build"
   command = "npm run build"
+  publish = "build"
 
+[build.environment]
+  NODE_VERSION = "22"
+
+# Every page is prerendered to its own HTML file (build/index.html,
+# build/publicaties/index.html), so no SPA catch-all is needed; unknown paths get
+# build/404.html automatically.
+
+# Old WordPress links to PDFs (wp-content/uploads/<year>/<month>/<file>.pdf) — the
+# PDFs now live in one folder.
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  from = "/wp-content/uploads/:year/:month/:file"
+  to = "/wp-content/uploads/publications/:file"
+  status = 301
 
+# The Talent naar de Top scrolly (public/monitor, synced from monitortalent.nl)
+[[redirects]]
+  from = "/monitor-2025"
+  to = "/monitor/"
+  status = 301
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
 
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
+[[headers]]
+  for = "/covers/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

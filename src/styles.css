@@ -1,25 +1,29 @@
 /* Wilma Henderikse — one stylesheet, tokens first.
    One sans family (Archivo, variable width + weight), set quietly: moderate sizes,
-   medium weights, hierarchy from scale, colour and space. Colour works in layers rather
-   than blocks: warm-white paper, soft teal-tinted panels, teal hairlines and labels, and
-   yellow only as a small mark (a short bar above a title, an underline on hover). One
-   deep-teal moment: the footer. An editorial grid with a label column on the left. */
+   medium weights, hierarchy from scale, colour and space. Colour is everywhere but
+   tonal: the page itself is a pale teal paper, and sections are layers of the same two
+   hues — teal from mist to deep, yellow from cream to straw — with small differences
+   between neighbours. Headings are deep teal, not black; labels are a muted gold.
+   An editorial grid with a label column on the left. */
 
 :root {
-  --paper: #fbfbf8;
-  --paper-2: #f3f5f2;
-  --white: #ffffff;
+  --paper: #e9f1ed;
+  --paper-2: #dde9e4;
+  --white: #f6faf8;
   --teal: #08574f;
   --teal-deep: #0a4842;
-  --teal-soft: #e0ebe7;
-  --teal-mist: #eef3f0;
+  --teal-mid: #1e6b62;
+  --teal-soft: #c9ddd6;
+  --teal-mist: #d6e5df;
   --yellow: #fcd21d;
-  --yellow-soft: #fbf1c9;
-  --ink: #1f2926;
-  --ink-2: #4a5552;
-  --muted: #7b8582;
-  --hair: rgba(8, 87, 79, 0.16);
-  --hair-soft: rgba(8, 87, 79, 0.09);
+  --yellow-soft: #f3e3a0;
+  --yellow-cream: #f4ecc9;
+  --gold: #a7850f;
+  --ink: #16332e;
+  --ink-2: #3f5b55;
+  --muted: #6c847e;
+  --hair: rgba(8, 87, 79, 0.22);
+  --hair-soft: rgba(8, 87, 79, 0.12);
 
   --font: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
 
@@ -85,7 +89,7 @@ ol {
 }
 
 ::selection {
-  background: var(--yellow-soft);
+  background: var(--yellow);
   color: var(--ink);
 }
 
@@ -218,11 +222,36 @@ ol {
 .btn--quiet {
   border-color: var(--hair);
   color: var(--teal);
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .btn--quiet:hover {
   border-color: var(--teal);
+}
+
+.feature .btn--teal {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: var(--teal-deep);
+}
+
+.feature .btn--teal span {
+  color: var(--teal-deep);
+}
+
+.feature .btn--teal:hover {
+  background: #fff;
+  border-color: #fff;
+}
+
+.feature .btn--quiet {
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
+  background: transparent;
+}
+
+.feature .btn--quiet:hover {
+  border-color: #fff;
 }
 
 .arrow-link {
@@ -254,6 +283,11 @@ ol {
 }
 
 .section--tint {
+  background: var(--yellow-cream);
+  border-top: 0;
+}
+
+.section--deep {
   background: var(--paper-2);
   border-top: 0;
 }
@@ -268,7 +302,7 @@ ol {
   grid-column: 1 / 3;
   font-size: 14px;
   font-weight: 600;
-  color: var(--teal);
+  color: var(--gold);
   padding-top: 4px;
 }
 
@@ -277,6 +311,7 @@ ol {
 }
 
 .section__title {
+  color: var(--teal-deep);
   max-width: 20em;
   margin-bottom: clamp(36px, 4.5vw, 56px);
   font-size: clamp(28px, 3.1vw, 42px);
@@ -307,7 +342,7 @@ ol {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(251, 251, 248, 0.92);
+  background: rgba(233, 241, 237, 0.92);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   transition: box-shadow 0.2s;
@@ -457,6 +492,7 @@ ol {
 /* ── hero ── */
 .hero {
   padding: clamp(32px, 5vw, 80px) 0 clamp(64px, 8vw, 112px);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--teal-mist) 100%);
 }
 
 .hero__grid {
@@ -476,7 +512,7 @@ ol {
   gap: 6px 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--teal);
+  color: var(--gold);
 }
 
 .hero__roles li + li::before {
@@ -493,6 +529,7 @@ ol {
   font-weight: 540;
   line-height: 0.98;
   letter-spacing: -0.032em;
+  color: var(--teal-deep);
 }
 
 .hero__lede {
@@ -517,7 +554,7 @@ ol {
   position: absolute;
   z-index: -1;
   inset: 0 20px 20px 0;
-  background: var(--teal-soft);
+  background: var(--yellow-soft);
 }
 
 .hero__portrait img {
@@ -554,6 +591,7 @@ ol {
 /* ── featured: the monitor — a soft teal panel ── */
 .feature {
   padding: 0 0 clamp(72px, 9vw, 128px);
+  background: var(--teal-mist);
 }
 
 .feature__panel {
@@ -562,8 +600,8 @@ ol {
   gap: 24px;
   align-items: center;
   padding: clamp(28px, 4vw, 56px);
-  background: var(--teal-mist);
-  border: 1px solid var(--hair-soft);
+  background: linear-gradient(160deg, var(--teal-mid) 0%, var(--teal) 55%, var(--teal-deep) 100%);
+  color: #e6f0ec;
 }
 
 .feature__text {
@@ -573,7 +611,7 @@ ol {
 .feature__label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--teal);
+  color: var(--yellow);
   margin-bottom: 20px;
 }
 
@@ -583,17 +621,17 @@ ol {
   font-weight: 560;
   line-height: 1.08;
   letter-spacing: -0.022em;
-  color: var(--teal-deep);
+  color: #fff;
 }
 
 .feature__title span {
   display: block;
   font-weight: 400;
-  color: var(--teal);
+  color: var(--yellow-soft);
 }
 
 .feature__body {
-  color: var(--ink-2);
+  color: #cfe0da;
   max-width: 30em;
 }
 
@@ -601,14 +639,13 @@ ol {
   grid-column: 6 / 13;
   display: block;
   margin-left: 24px;
-  border: 1px solid var(--hair);
-  background: #fff;
-  padding: 6px;
-  transition: border-color 0.2s;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 8px;
+  transition: background-color 0.2s;
 }
 
 .feature__preview:hover {
-  border-color: var(--teal);
+  background: rgba(255, 255, 255, 0.26);
 }
 
 .feature__preview img {
@@ -650,6 +687,7 @@ ol {
   font-size: clamp(20px, 1.9vw, 24px);
   font-weight: 560;
   letter-spacing: -0.012em;
+  color: var(--teal-deep);
   background: linear-gradient(var(--yellow), var(--yellow)) 0 100% / 0 2px no-repeat;
   transition: background-size 0.3s var(--ease);
   width: fit-content;
@@ -698,8 +736,8 @@ ol {
   position: relative;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: var(--paper-2);
-  outline: 1px solid rgba(31, 41, 38, 0.12);
+  background: var(--teal-mist);
+  outline: 1px solid rgba(8, 87, 79, 0.18);
   outline-offset: -1px;
   transition: transform 0.35s var(--ease);
 }
@@ -763,8 +801,8 @@ ol {
 }
 
 .cover--leeftijd {
-  background: var(--paper-2);
-  color: var(--ink);
+  background: var(--teal-mid);
+  color: #fff;
 }
 
 .cover--werkzorg {
@@ -773,8 +811,8 @@ ol {
 }
 
 .cover--beleid {
-  background: var(--white);
-  color: var(--ink);
+  background: var(--yellow-cream);
+  color: var(--teal-deep);
 }
 
 /* ── publication card ── */
@@ -794,7 +832,7 @@ ol {
 
 .pub__link:hover .pub__title,
 .pub__link:focus-visible .pub__title {
-  color: var(--teal);
+  color: var(--teal-mid);
 }
 
 .pub__body {
@@ -815,6 +853,7 @@ ol {
 }
 
 .pub__title {
+  color: var(--teal-deep);
   font-size: 17px;
   font-weight: 580;
   line-height: 1.3;
@@ -892,7 +931,7 @@ ol {
 /* ── quote ── */
 .quote {
   padding: clamp(72px, 9vw, 120px) 0;
-  border-top: 1px solid var(--hair-soft);
+  background: var(--teal-soft);
 }
 
 .quote__grid {
@@ -926,7 +965,7 @@ ol {
   margin-top: 22px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--gold);
 }
 
 @media (max-width: 760px) {
@@ -980,7 +1019,7 @@ ol {
 
 /* ── contact: a pale yellow layer ── */
 .contact {
-  background: var(--yellow-soft);
+  background: linear-gradient(180deg, var(--yellow-cream) 0%, var(--yellow-soft) 100%);
   padding: clamp(72px, 9vw, 128px) 0;
 }
 
@@ -988,6 +1027,7 @@ ol {
   font-size: clamp(22px, 2.2vw, 30px);
   font-weight: 540;
   letter-spacing: -0.015em;
+  color: var(--teal-deep);
 }
 
 .contact__title::before {
@@ -1052,6 +1092,7 @@ ol {
 /* ── publicaties page ── */
 .page-head {
   padding: clamp(36px, 5vw, 72px) 0 clamp(28px, 4vw, 48px);
+  background: linear-gradient(180deg, var(--paper) 0%, var(--teal-mist) 100%);
 }
 
 .page-head__grid {
@@ -1067,6 +1108,7 @@ ol {
   font-weight: 560;
   line-height: 1.02;
   letter-spacing: -0.028em;
+  color: var(--teal-deep);
 }
 
 .page-lede {
@@ -1088,7 +1130,7 @@ ol {
   position: sticky;
   top: var(--header-h);
   z-index: 20;
-  background: rgba(251, 251, 248, 0.94);
+  background: rgba(233, 241, 237, 0.94);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--hair);
@@ -1174,9 +1216,9 @@ ol {
 }
 
 .chip.is-active {
-  background: var(--teal-soft);
+  background: var(--teal);
   border-color: var(--teal);
-  color: var(--teal-deep);
+  color: #fff;
 }
 
 @media (max-width: 760px) {

@@ -147,7 +147,7 @@ function Quote() {
 
 function About() {
   return (
-    <Section id="over" label="Over Wilma" title="Een leven lang bezig met gelijke kansen.">
+    <Section id="over" label="Over Wilma" title="Een leven lang bezig met gelijke kansen." className="section--deep">
       <div className="about">
         <figure className="about__photo reveal">
           <img

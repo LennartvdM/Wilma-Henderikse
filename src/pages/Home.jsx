@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PubCard from '../components/PubCard';
 import { catalog, THEMES } from '../data/catalog';
@@ -60,36 +60,61 @@ function Hero() {
   );
 }
 
+// The monitor itself, live and full-width, on screens wide enough for the desktop deck.
+// Phones get the preview and the link: a scroll-driven deck inside a frame on a phone
+// fights the page scroll.
+function useWideScreen() {
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 900px) and (pointer: fine)');
+    const update = () => setWide(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return wide;
+}
+
 function MonitorFeature() {
+  const wide = useWideScreen();
   return (
     <section className="feature" id="monitor" aria-labelledby="feature-title">
-      <div className="wrap">
-        <div className="feature__panel reveal">
-          <div className="feature__text">
-            <p className="feature__label">Uitgelicht · interactief</p>
-            <h2 id="feature-title" className="feature__title">
-              Talent naar de Top <span>Monitor 2025</span>
-            </h2>
-            <p className="feature__body">
-              De voortgang van vrouwen en cultureel divers talent in topfuncties bij Nederlandse
-              organisaties — niet als rapport, maar als verhaal om doorheen te scrollen. Wilma
-              Henderikse werkte mee aan de analyse en presentatie.
-            </p>
-            <div className="actions">
-              <a className="btn btn--teal" href="/monitor/">
-                Open de monitor <span aria-hidden="true">→</span>
+      <div className="wrap section__grid feature__head">
+        <p className="section__label reveal">Uitgelicht</p>
+        <div className="section__body feature__intro reveal">
+          <h2 id="feature-title" className="feature__title">
+            Talent naar de Top <span>Monitor 2025</span>
+          </h2>
+          <p className="feature__body">
+            De voortgang van vrouwen en cultureel divers talent in topfuncties bij Nederlandse
+            organisaties — niet als rapport, maar als verhaal om doorheen te scrollen. Wilma
+            Henderikse werkte mee aan de analyse en presentatie.
+          </p>
+          <div className="actions">
+            <a className="btn btn--teal" href="/monitor/">
+              {wide ? 'Open op volledig scherm' : 'Open de monitor'} <span aria-hidden="true">→</span>
+            </a>
+            {REPORT_2024 && (
+              <a className="btn btn--quiet" href={REPORT_2024.href} target="_blank" rel="noopener noreferrer">
+                Rapport 2024 · PDF
               </a>
-              {REPORT_2024 && (
-                <a className="btn btn--quiet" href={REPORT_2024.href} target="_blank" rel="noopener noreferrer">
-                  Rapport 2024 · PDF
-                </a>
-              )}
-            </div>
+            )}
           </div>
-          <a className="feature__preview" href="/monitor/" tabIndex={-1} aria-hidden="true">
+        </div>
+      </div>
+      <div className="feature__stage reveal">
+        {wide ? (
+          <iframe
+            className="feature__frame"
+            src="/monitor/"
+            title="Talent naar de Top — Monitor 2025, interactief"
+            loading="lazy"
+          />
+        ) : (
+          <a className="feature__preview" href="/monitor/" aria-label="Open de monitor">
             <img src="/img/monitor-preview.webp" width="1200" height="750" alt="" loading="lazy" />
           </a>
-        </div>
+        )}
       </div>
     </section>
   );

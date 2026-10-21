@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PubCard from '../components/PubCard';
 import { catalog, THEMES } from '../data/catalog';
@@ -60,9 +60,8 @@ function Hero() {
   );
 }
 
-// The monitor itself, live and full-width, on screens wide enough for the desktop deck.
-// Phones get the preview and the link: a scroll-driven deck inside a frame on a phone
-// fights the page scroll.
+// The monitor itself, live, on screens wide enough for the desktop deck. Phones get the
+// preview and the link: a scroll-driven deck inside a frame on a phone fights the page scroll.
 function useWideScreen() {
   const [wide, setWide] = useState(false);
   useEffect(() => {
@@ -73,6 +72,82 @@ function useWideScreen() {
     return () => mq.removeEventListener('change', update);
   }, []);
   return wide;
+}
+
+// The deck's Inleiding has women hopping in from all over its screen. Inside a frame that
+// ends at the frame's edge — so we ADOPT the deck's two sky layers (same origin) into a
+// host element laid exactly over the frame, without clipping: the deck keeps animating
+// them, their coordinates now simply run past the frame. And the deck starts on the
+// reader's first wheel tick, which we give it once the frame is well in view.
+function useLiveDeck(frameRef, skyRef, stageRef) {
+  useEffect(() => {
+    const frame = frameRef.current;
+    const sky = skyRef.current;
+    const stage = stageRef.current;
+    if (!frame || !sky || !stage) return undefined;
+    let observer;
+    let io;
+    let ticked = false;
+    const adopt = () => {
+      const doc = frame.contentDocument;
+      if (!doc || !doc.body) return;
+      doc.querySelectorAll('.p02-sky').forEach((layer) => sky.appendChild(layer));
+    };
+    const start = () => {
+      const doc = frame.contentDocument;
+      if (!doc || !doc.body || !doc.defaultView) return;
+      adopt();
+      observer = new MutationObserver(adopt);
+      observer.observe(doc.body, { childList: true });
+      io = new IntersectionObserver(
+        (entries) => {
+          if (ticked || !entries.some((e) => e.intersectionRatio >= 0.6)) return;
+          ticked = true;
+          doc.defaultView.dispatchEvent(new WheelEvent('wheel', { deltaY: 120, bubbles: true, cancelable: true }));
+          io.disconnect();
+        },
+        { threshold: [0.6] },
+      );
+      io.observe(stage);
+    };
+    if (frame.contentDocument?.readyState === 'complete' && frame.contentDocument.body?.children.length) start();
+    else frame.addEventListener('load', start, { once: true });
+    return () => {
+      frame.removeEventListener('load', start);
+      observer?.disconnect();
+      io?.disconnect();
+    };
+  }, [frameRef, skyRef, stageRef]);
+}
+
+function LiveMonitor() {
+  const frameRef = useRef(null);
+  const skyRef = useRef(null);
+  const stageRef = useRef(null);
+  useLiveDeck(frameRef, skyRef, stageRef);
+  return (
+    <div className="feature__stage" ref={stageRef}>
+      <aside className="feature__path">
+        <p className="feature__note">
+          Scroll in het venster om door de monitor te gaan; scroll hier om verder te gaan op deze
+          pagina.
+        </p>
+        <a className="arrow-link" href="/monitor/">
+          Volledig scherm <span aria-hidden="true">→</span>
+        </a>
+      </aside>
+      <div className="feature__window">
+        <iframe
+          ref={frameRef}
+          className="feature__frame"
+          src="/monitor/"
+          title="Talent naar de Top — Monitor 2025, interactief"
+          loading="lazy"
+        />
+        <div className="feature__sky" ref={skyRef} aria-hidden="true" />
+      </div>
+    </div>
+  );
 }
 
 function MonitorFeature() {
@@ -102,20 +177,15 @@ function MonitorFeature() {
           </div>
         </div>
       </div>
-      <div className="feature__stage reveal">
-        {wide ? (
-          <iframe
-            className="feature__frame"
-            src="/monitor/"
-            title="Talent naar de Top — Monitor 2025, interactief"
-            loading="lazy"
-          />
-        ) : (
+      {wide ? (
+        <LiveMonitor />
+      ) : (
+        <div className="feature__stage feature__stage--still reveal">
           <a className="feature__preview" href="/monitor/" aria-label="Open de monitor">
             <img src="/img/monitor-preview.webp" width="1200" height="750" alt="" loading="lazy" />
           </a>
-        )}
-      </div>
+        </div>
+      )}
     </section>
   );
 }
